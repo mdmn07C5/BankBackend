@@ -2,6 +2,7 @@ package postgresdb
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -12,6 +13,7 @@ func TestTransferTx(t *testing.T) {
 
 	account1 := createRandomAccount(t)
 	account2 := createRandomAccount(t)
+	fmt.Println(">> before:", account1.Balance, account2.Balance)
 
 	n := 10
 	amount := int64(10)
@@ -37,6 +39,8 @@ func TestTransferTx(t *testing.T) {
 			results <- result
 		}()
 	}
+
+	exists := make(map[int]bool)
 
 	for i := 0; i < n; i++ {
 		err := <-errs
@@ -83,6 +87,39 @@ func TestTransferTx(t *testing.T) {
 		require.NoError(t, err)
 
 		// TODO: check account's balance
+		// check accounts
+		fromAccount := res.FromAccount
+		require.NotEmpty(t, fromAccount)
+		require.Equal(t, fromAccount.ID, res.FromAccount.ID)
+
+		toAccount := res.ToAccount
+		require.NotEmpty(t, toAccount)
+		require.Equal(t, toAccount.ID, res.ToAccount.ID)
+
+		// check accounts balance
+		fmt.Println(">> tx:", fromAccount.Balance, toAccount.Balance)
+		delta1 := account1.Balance - fromAccount.Balance
+		delta2 := toAccount.Balance - account2.Balance
+		require.Equal(t, delta1, delta2)
+		require.True(t, delta1 > 0)
+		require.True(t, delta1%amount == 0)
+
+		k := int(delta1 / amount)
+		require.True(t, 1 <= k && k <= n)
+		require.NotContains(t, exists, k)
+		exists[k] = true
 	}
+
+	// check final balances
+	updatedAccount1, err := testQueries.GetAccount(context.Background(), account1.ID)
+	require.NoError(t, err)
+
+	updatedAccount2, err := testQueries.GetAccount(context.Background(), account2.ID)
+	require.NoError(t, err)
+
+	fmt.Println(">> after:", updatedAccount1.Balance, updatedAccount2.Balance)
+
+	require.Equal(t, account1.Balance-int64(n)*amount, updatedAccount1.Balance)
+	require.Equal(t, account2.Balance+int64(n)*amount, updatedAccount2.Balance)
 
 }
