@@ -25,6 +25,7 @@ func NewServer(store *db.Store) *Server {
 	router.POST("/accounts", server.createAccount) // if multiple handlers are passed, the last one is the real handler - the rest are middleware
 	router.GET("/accounts/:id", server.getAccount)
 	router.GET("/accounts", server.listAccounts)
+	router.PUT("/accounts", server.updateAccount) //might change later
 
 	server.router = router
 	return server
