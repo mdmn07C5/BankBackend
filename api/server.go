@@ -21,12 +21,14 @@ func NewServer(store *db.Store) *Server {
 	server := &Server{store: store}
 	router := gin.Default()
 
-	// TODO: add routes to router
 	router.POST("/accounts", server.createAccount) // if multiple handlers are passed, the last one is the real handler - the rest are middleware
 	router.GET("/accounts/:id", server.getAccount)
 	router.GET("/accounts", server.listAccounts)
+	// Not sure I want these
 	router.PUT("/accounts", server.updateAccount) //might change later
 	router.DELETE("/accounts/:id", server.deleteAccount)
+
+	// TODO: add transfer routes
 
 	server.router = router
 	return server
