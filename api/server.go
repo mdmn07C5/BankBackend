@@ -24,9 +24,8 @@ func NewServer(store db.Store) *Server {
 	router := gin.Default()
 
 	// add custom validators
-
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-		v.RegisterValidation("currency", validCurrency)
+		v.RegisterValidation("supportedCurrency", validCurrency)
 	}
 
 	// Routes
