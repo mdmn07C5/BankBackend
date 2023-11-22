@@ -39,15 +39,23 @@ func TestTransferAPI(t *testing.T) {
 				"currency":        util.USD,
 			},
 			buildStubs: func(mockStore *mockdb.MockStore) {
-				mockStore.EXPECT().GetAccount(gomock.Any(), gomock.Eq(fromAccount.ID)).Times(1).Return(fromAccount, nil)
-				mockStore.EXPECT().GetAccount(gomock.Any(), gomock.Eq(toAccount.ID)).Times(1).Return(toAccount, nil)
+				mockStore.EXPECT().
+					GetAccount(gomock.Any(), gomock.Eq(fromAccount.ID)).
+					Times(1).
+					Return(fromAccount, nil)
+				mockStore.EXPECT().
+					GetAccount(gomock.Any(), gomock.Eq(toAccount.ID)).
+					Times(1).
+					Return(toAccount, nil)
 
 				tx := db.TransferTxParams{
 					FromAccountID: fromAccount.ID,
 					ToAccountID:   toAccount.ID,
 					Amount:        amount,
 				}
-				mockStore.EXPECT().TransferTx(gomock.Any(), gomock.Eq(tx)).Times(1)
+				mockStore.EXPECT().
+					TransferTx(gomock.Any(), gomock.Eq(tx)).
+					Times(1)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
