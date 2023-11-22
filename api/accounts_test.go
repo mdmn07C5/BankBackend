@@ -10,6 +10,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	mockdb "github.com/mdmn07C5/bank/db/mock"
 	db "github.com/mdmn07C5/bank/db/sqlc"
@@ -112,22 +113,25 @@ func TestGetAccountAPI(t *testing.T) {
 
 func TestCreateAccountAPI(t *testing.T) {
 	account := randomAccount()
-	accountCreatedParams := db.CreateAccountParams{
-		Owner:    account.Owner,
-		Currency: account.Currency,
-		Balance:  0,
-	}
 
 	testCases := []struct {
 		name          string
-		accountParams db.CreateAccountParams
+		accountParams gin.H
 		buildStubs    func(mockStore *mockdb.MockStore)
 		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
 	}{
 		{
-			name:          "OK",
-			accountParams: accountCreatedParams,
+			name: "OK",
+			accountParams: gin.H{
+				"owner":    account.Owner,
+				"currency": account.Currency,
+			},
 			buildStubs: func(mockStore *mockdb.MockStore) {
+				accountCreatedParams := db.CreateAccountParams{
+					Owner:    account.Owner,
+					Currency: account.Currency,
+					Balance:  0,
+				}
 				mockStore.EXPECT().
 					CreateAccount(gomock.Any(), gomock.Eq(accountCreatedParams)).
 					Times(1).
@@ -139,8 +143,11 @@ func TestCreateAccountAPI(t *testing.T) {
 			},
 		},
 		{
-			name:          "InternalError",
-			accountParams: accountCreatedParams,
+			name: "InternalError",
+			accountParams: gin.H{
+				"owner":    account.Owner,
+				"currency": account.Currency,
+			},
 			buildStubs: func(mockStore *mockdb.MockStore) {
 				mockStore.EXPECT().
 					CreateAccount(gomock.Any(), gomock.Any()).
@@ -153,10 +160,9 @@ func TestCreateAccountAPI(t *testing.T) {
 		},
 		{
 			name: "InvalidCurrency",
-			accountParams: db.CreateAccountParams{
-				Owner:    account.Owner,
-				Currency: "PooPooPeePee",
-				Balance:  0,
+			accountParams: gin.H{
+				"owner":    account.Owner,
+				"currency": "PoopooPeepee",
 			},
 			buildStubs: func(mockStore *mockdb.MockStore) {
 				mockStore.EXPECT().
