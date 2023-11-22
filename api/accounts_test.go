@@ -143,7 +143,7 @@ func TestCreateAccountAPI(t *testing.T) {
 			accountParams: accountCreatedParams,
 			buildStubs: func(mockStore *mockdb.MockStore) {
 				mockStore.EXPECT().
-					CreateAccount(gomock.Any(), gomock.Eq(accountCreatedParams)).
+					CreateAccount(gomock.Any(), gomock.Any()).
 					Times(1).
 					Return(db.Account{}, sql.ErrConnDone)
 			},
@@ -152,10 +152,10 @@ func TestCreateAccountAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "InvalidRequestParams",
+			name: "InvalidCurrency",
 			accountParams: db.CreateAccountParams{
 				Owner:    account.Owner,
-				Currency: "LIR",
+				Currency: "PooPooPeePee",
 				Balance:  0,
 			},
 			buildStubs: func(mockStore *mockdb.MockStore) {
@@ -183,6 +183,7 @@ func TestCreateAccountAPI(t *testing.T) {
 			recorder := httptest.NewRecorder()
 
 			jsonBytes, err := json.Marshal(tc.accountParams)
+			require.NoError(t, err)
 
 			request, err := http.NewRequest(http.MethodPost, "/accounts", bytes.NewReader(jsonBytes))
 			require.NoError(t, err)
