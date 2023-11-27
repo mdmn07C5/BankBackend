@@ -10,8 +10,14 @@ dropdb:
 migrateup:
 	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/bank?sslmode=disable" -verbose up
 
+migrateup1:
+	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/bank?sslmode=disable" -verbose up 1
+
 migratedown:
 	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/bank?sslmode=disable" -verbose down
+
+migratedown1:
+	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/bank?sslmode=disable" -verbose down 1
 
 sqlc:
 	sqlc generate
@@ -31,4 +37,4 @@ mock:
 testAPI:
 	go test -v github.com/mdmn07C5/bank/api
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc test server mock testAPI
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc test server mock testAPI migrateup1 migratedown1
