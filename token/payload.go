@@ -1,6 +1,7 @@
 package token
 
 import (
+	"errors"
 	"time"
 
 	jwt "github.com/golang-jwt/jwt/v5"
@@ -59,9 +60,14 @@ func NewPayLoad(username string, duration time.Duration) (*Payload, error) {
 	return payload, nil
 }
 
+var (
+	ErrExpiredToken = errors.New("token is expired")
+	ErrInvalidToken = errors.New("token is invalid")
+)
+
 func (payload *Payload) Validate() error {
 	if time.Now().After(payload.ExpiredAt) {
-		return jwt.ErrTokenExpired
+		return ErrInvalidToken
 	}
 	return nil
 }
