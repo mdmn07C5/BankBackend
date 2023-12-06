@@ -39,24 +39,22 @@ func (maker *JWTMaker) VerifyToken(token string) (*Payload, error) {
 	keyFunc := func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
 		if !ok {
-			return nil, jwt.ErrInvalidKeyType
+			return nil, ErrInvalidToken
 		}
 		return []byte(maker.secretKey), nil
 	}
 
 	jwtToken, err := jwt.ParseWithClaims(token, &Payload{}, keyFunc)
-
 	if err != nil {
-		// jwt wraps error in a bunch of stupid shit
 		if errors.Is(err, jwt.ErrTokenExpired) {
-			return nil, jwt.ErrTokenExpired
+			return nil, ErrExpiredToken
 		}
-		return nil, jwt.ErrTokenSignatureInvalid
+		return nil, ErrInvalidToken
 	}
 
 	payload, ok := jwtToken.Claims.(*Payload)
 	if !ok {
-		return nil, jwt.ErrTokenSignatureInvalid
+		return nil, ErrInvalidToken
 	}
 
 	return payload, nil

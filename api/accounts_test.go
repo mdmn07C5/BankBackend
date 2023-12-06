@@ -96,7 +96,7 @@ func TestGetAccountAPI(t *testing.T) {
 			tc.buildStubs(mockStore)
 
 			// start test server
-			server := NewServer(mockStore)
+			server := newTestServer(t, mockStore)
 			recorder := httptest.NewRecorder()
 
 			// declare url path of API and create request
@@ -185,7 +185,7 @@ func TestCreateAccountAPI(t *testing.T) {
 
 			tc.buildStubs(mockStore)
 
-			server := NewServer(mockStore)
+			server := newTestServer(t, mockStore)
 			recorder := httptest.NewRecorder()
 
 			jsonBytes, err := json.Marshal(tc.accountParams)
@@ -297,7 +297,7 @@ func TestListAccountsAPI(t *testing.T) {
 
 			tc.buildStubs(mockStore)
 
-			server := NewServer(mockStore)
+			server := newTestServer(t, mockStore)
 			recorder := httptest.NewRecorder()
 
 			url := "/accounts"

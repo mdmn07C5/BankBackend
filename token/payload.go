@@ -65,7 +65,7 @@ var (
 	ErrInvalidToken = errors.New("token is invalid")
 )
 
-func (payload *Payload) Validate() error {
+func (payload *Payload) Valid() error {
 	if time.Now().After(payload.ExpiredAt) {
 		return ErrInvalidToken
 	}

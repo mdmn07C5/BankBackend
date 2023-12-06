@@ -223,7 +223,7 @@ func TestTransferAPI(t *testing.T) {
 
 			tc.buildStubs(mockStore)
 
-			server := NewServer(mockStore)
+			server := newTestServer(t, mockStore)
 			recorder := httptest.NewRecorder()
 
 			body, err := json.Marshal(tc.body)

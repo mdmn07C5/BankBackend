@@ -62,7 +62,7 @@ func TestInvalidJWTTokenAlgNone(t *testing.T) {
 
 	payload, err = maker.VerifyToken(token)
 	require.Error(t, err)
-	require.EqualError(t, err, jwt.ErrTokenSignatureInvalid.Error())
+	require.EqualError(t, err, ErrInvalidToken.Error())
 	fmt.Println(err.Error())
 	require.Nil(t, payload)
 }
