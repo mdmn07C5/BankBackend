@@ -67,7 +67,7 @@ var (
 
 func (payload *Payload) Valid() error {
 	if time.Now().After(payload.ExpiredAt) {
-		return ErrInvalidToken
+		return ErrExpiredToken
 	}
 	return nil
 }
