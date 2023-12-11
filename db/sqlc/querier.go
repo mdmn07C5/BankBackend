@@ -22,12 +22,14 @@ type Querier interface {
 	GetAccountForUpdate(ctx context.Context, id int64) (Account, error)
 	GetEntry(ctx context.Context, id int64) (Entry, error)
 	GetSession(ctx context.Context, id uuid.UUID) (Session, error)
+	GetSessionForUpdate(ctx context.Context, id uuid.UUID) (Session, error)
 	GetTransfer(ctx context.Context, id int64) (Transfer, error)
 	GetUser(ctx context.Context, username string) (User, error)
 	ListAccounts(ctx context.Context, arg ListAccountsParams) ([]Account, error)
 	ListEntries(ctx context.Context, arg ListEntriesParams) ([]Entry, error)
 	ListTransfers(ctx context.Context, arg ListTransfersParams) ([]Transfer, error)
 	UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error)
+	UpdateBlockSession(ctx context.Context, arg UpdateBlockSessionParams) (Session, error)
 }
 
 var _ Querier = (*Queries)(nil)

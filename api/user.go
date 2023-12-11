@@ -2,7 +2,10 @@ package api
 
 import (
 	"database/sql"
+	"errors"
+	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -144,6 +147,78 @@ func (server *Server) loginUser(ctx *gin.Context) {
 		RefreshToken:          refreshToken,
 		RefreshTokenExpiresAt: refreshPayload.ExpiredAt,
 		User:                  newUserResponse(user),
+	}
+
+	ctx.JSON(http.StatusOK, rsp)
+}
+
+type logoutUserRequest struct {
+	SessionID uuid.UUID `json:"session_id" binding:"required"`
+}
+
+type logoutUserResponse struct {
+	Username    string    `json:"username"`
+	LoggedOutAt time.Time `json:"logged_out_at"`
+}
+
+func (server *Server) logoutUser(ctx *gin.Context) {
+	var req logoutUserRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	session, err := server.store.GetSessionForUpdate(ctx, req.SessionID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	authorizationHeader := ctx.GetHeader(authorizationHeaderKey)
+	if len(authorizationHeader) == 0 {
+		err := errors.New("authorization header not provided")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	fields := strings.Fields(authorizationHeader)
+	if len(fields) < 2 {
+		err := errors.New("authorization header malformed")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	accessToken := fields[1]
+	payload, err := server.tokenMaker.VerifyToken(accessToken)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	if session.Username != payload.Username {
+		err := fmt.Errorf("incorrect session user")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	arg := db.UpdateBlockSessionParams{
+		ID:        req.SessionID,
+		IsBlocked: true,
+		ExpiresAt: time.Now(),
+	}
+
+	if _, err := server.store.UpdateBlockSession(ctx, arg); err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	rsp := logoutUserResponse{
+		Username:    session.Username,
+		LoggedOutAt: time.Now(),
 	}
 
 	ctx.JSON(http.StatusOK, rsp)

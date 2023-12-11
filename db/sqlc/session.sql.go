@@ -80,3 +80,54 @@ func (q *Queries) GetSession(ctx context.Context, id uuid.UUID) (Session, error)
 	)
 	return i, err
 }
+
+const getSessionForUpdate = `-- name: GetSessionForUpdate :one
+SELECT id, username, refresh_token, user_agent, client_ip, is_blocked, expires_at, created_at FROM sessions
+WHERE id = $1 LIMIT 1
+FOR NO KEY UPDATE
+`
+
+func (q *Queries) GetSessionForUpdate(ctx context.Context, id uuid.UUID) (Session, error) {
+	row := q.db.QueryRowContext(ctx, getSessionForUpdate, id)
+	var i Session
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.RefreshToken,
+		&i.UserAgent,
+		&i.ClientIp,
+		&i.IsBlocked,
+		&i.ExpiresAt,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const updateBlockSession = `-- name: UpdateBlockSession :one
+UPDATE sessions 
+SET is_blocked = $2, expires_at = $3
+WHERE id = $1
+RETURNING id, username, refresh_token, user_agent, client_ip, is_blocked, expires_at, created_at
+`
+
+type UpdateBlockSessionParams struct {
+	ID        uuid.UUID `json:"id"`
+	IsBlocked bool      `json:"is_blocked"`
+	ExpiresAt time.Time `json:"expires_at"`
+}
+
+func (q *Queries) UpdateBlockSession(ctx context.Context, arg UpdateBlockSessionParams) (Session, error) {
+	row := q.db.QueryRowContext(ctx, updateBlockSession, arg.ID, arg.IsBlocked, arg.ExpiresAt)
+	var i Session
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.RefreshToken,
+		&i.UserAgent,
+		&i.ClientIp,
+		&i.IsBlocked,
+		&i.ExpiresAt,
+		&i.CreatedAt,
+	)
+	return i, err
+}
