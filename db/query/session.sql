@@ -14,3 +14,14 @@ INSERT INTO sessions (
 -- name: GetSession :one
 SELECT * FROM sessions
 WHERE id = $1 LIMIT 1;
+
+-- name: GetSessionForUpdate :one
+SELECT * FROM sessions
+WHERE id = $1 LIMIT 1
+FOR NO KEY UPDATE;
+
+-- name: UpdateBlockSession :one
+UPDATE sessions 
+SET is_blocked = $2, expires_at = $3
+WHERE id = $1
+RETURNING *;

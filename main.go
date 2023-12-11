@@ -21,6 +21,10 @@ func main() {
 		log.Fatal("cannot connect to db:", err)
 	}
 	store := db.NewStore(conn)
+
+	// temp
+	db.Seed(store)
+
 	server, err := api.NewServer(config, store)
 	if err != nil {
 		log.Fatal("cannot create server:", err)
@@ -30,4 +34,5 @@ func main() {
 	if err != nil {
 		log.Fatal("cannot start server:", err)
 	}
+
 }

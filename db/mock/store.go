@@ -200,6 +200,21 @@ func (mr *MockStoreMockRecorder) GetSession(arg0, arg1 interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSession", reflect.TypeOf((*MockStore)(nil).GetSession), arg0, arg1)
 }
 
+// GetSessionForUpdate mocks base method.
+func (m *MockStore) GetSessionForUpdate(arg0 context.Context, arg1 uuid.UUID) (postgresdb.Session, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSessionForUpdate", arg0, arg1)
+	ret0, _ := ret[0].(postgresdb.Session)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSessionForUpdate indicates an expected call of GetSessionForUpdate.
+func (mr *MockStoreMockRecorder) GetSessionForUpdate(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSessionForUpdate", reflect.TypeOf((*MockStore)(nil).GetSessionForUpdate), arg0, arg1)
+}
+
 // GetTransfer mocks base method.
 func (m *MockStore) GetTransfer(arg0 context.Context, arg1 int64) (postgresdb.Transfer, error) {
 	m.ctrl.T.Helper()
@@ -303,4 +318,19 @@ func (m *MockStore) UpdateAccount(arg0 context.Context, arg1 postgresdb.UpdateAc
 func (mr *MockStoreMockRecorder) UpdateAccount(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAccount", reflect.TypeOf((*MockStore)(nil).UpdateAccount), arg0, arg1)
+}
+
+// UpdateBlockSession mocks base method.
+func (m *MockStore) UpdateBlockSession(arg0 context.Context, arg1 postgresdb.UpdateBlockSessionParams) (postgresdb.Session, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateBlockSession", arg0, arg1)
+	ret0, _ := ret[0].(postgresdb.Session)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateBlockSession indicates an expected call of UpdateBlockSession.
+func (mr *MockStoreMockRecorder) UpdateBlockSession(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateBlockSession", reflect.TypeOf((*MockStore)(nil).UpdateBlockSession), arg0, arg1)
 }
