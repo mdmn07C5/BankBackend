@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/mdmn07C5/bank/token"
 )
 
@@ -79,19 +78,13 @@ func sessionMiddleWare(server *Server) gin.HandlerFunc {
 			return
 		}
 
-		sessionid := ctx.GetHeader(sessionHeaderKey)
-		if len(sessionid) == 0 {
-			err := errors.New("session id not provided")
+		var req logoutUserRequest
+		if err := ctx.ShouldBindJSON(&req); err != nil {
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, errorResponse(err))
 			return
 		}
 
-		sessionID, err := uuid.Parse(sessionid)
-		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
-			return
-		}
-		session, err := server.store.GetSession(ctx, sessionID)
+		session, err := server.store.GetSession(ctx, req.SessionID)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				ctx.AbortWithStatusJSON(http.StatusNotFound, errorResponse(err))
@@ -113,6 +106,5 @@ func sessionMiddleWare(server *Server) gin.HandlerFunc {
 		}
 
 		ctx.Next()
-
 	}
 }
