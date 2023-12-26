@@ -161,8 +161,6 @@ func TestGetAccountAPI(t *testing.T) {
 func TestCreateAccountAPI(t *testing.T) {
 	user, _ := randomUser(t)
 	account := randomAccount(user.Username)
-	user1, _ := randomUser(t)
-	account1 := randomAccount(user1.Username)
 
 	testCases := []struct {
 		name          string
@@ -197,28 +195,21 @@ func TestCreateAccountAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "FKViolation",
+			name: "NoAuthorization",
 			accountParams: gin.H{
-				"owner":    account1.Owner,
-				"currency": account1.Currency,
+				"owner":    account.Owner,
+				"currency": account.Currency,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
+
 			},
 			buildStubs: func(mockStore *mockdb.MockStore) {
-				accountCreatedParams := db.CreateAccountParams{
-					Owner:    account1.Owner,
-					Currency: account1.Currency,
-					Balance:  0,
-				}
 				mockStore.EXPECT().
-					CreateAccount(gomock.Any(), gomock.Eq(accountCreatedParams)).
-					Times(1).
-					Return(db.Account{}, nil)
+					CreateAccount(gomock.Any(), gomock.Any()).
+					Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusForbidden, recorder.Code)
-				requireBodyMatchAccount(t, recorder.Body, account)
+				require.Equal(t, http.StatusUnauthorized, recorder.Code)
 			},
 		},
 		{
