@@ -72,7 +72,7 @@ curl --header "Content-Type: application/json" \
     --data '{"session_id":"<session id>"}' \
     http://localhost:8080/tokens/users/logout
 ```
-The `session_id` can be acquired from the Login response. Not that as of yet, all this does is invalidates the refresh token so the user can no longer renew, it does not prevent access to other resources while the access token yet to expire. 
+The `session_id` can be acquired from the Login response. Note that as of yet, all logout does is invalidates the refresh token so the user can no longer renew their access token. It does not prevent access to other resources while the access token yet to expire.
 
 
 
