@@ -51,6 +51,7 @@ jobs:
 
     - name: Deploy image to EKS cluster
       run: |
-        kubectl apply -f eks/aws-auth.yaml
+
         kubectl apply -f eks/deployment.yaml
         kubectl apply -f eks/service.yaml
+      
