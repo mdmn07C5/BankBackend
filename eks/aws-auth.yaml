@@ -5,7 +5,8 @@ metadata:
   namespace: kube-system
 data:
   mapUsers: |
-    - userarn: arn:aws:iam::546731763938:user/github-ci
-      username: github-ci
+    - rolearn: arn:aws:iam::546731763938:role/deployment-provider
+      username: system:node:{{EC2PrivateDNSName}}
       groups:
-        - system:masters
+        - system:bootstrappers
+        - system:nodes
