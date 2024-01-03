@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bank-api-deployment
+  labels:
+    app: bank-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bank-api
+  template:
+    metadata:
+      labels:
+        app: bank-api
+    spec:
+      containers:
+      - name: bank-api
+        image: 546731763938.dkr.ecr.us-east-1.amazonaws.com/bank:18b4e6bac9fd5c67c672fc741e55062bfd9e78e5
+        ports:
+        - containerPort: 8080
