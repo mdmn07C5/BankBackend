@@ -5,7 +5,7 @@ metadata:
   namespace: kube-system
 data:
   mapUsers: |
-    - rolearn: arn:aws:iam::546731763938:role/deployment-provider
+    - rolearn: arn:aws:iam::546731763938:role/AWS-EKS-cluster-role
       username: system:node:{{EC2PrivateDNSName}}
       groups:
         - system:bootstrappers
