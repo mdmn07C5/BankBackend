@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"log"
 	"net"
+	"net/http"
 
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	_ "github.com/lib/pq"
 	"github.com/mdmn07C5/bank/api"
 	db "github.com/mdmn07C5/bank/db/sqlc"
@@ -13,6 +16,7 @@ import (
 	"github.com/mdmn07C5/bank/util"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 func main() {
@@ -29,8 +33,50 @@ func main() {
 
 	// temp
 	db.Seed(store)
+
+	go runGatewayServer(config, store)
 	runGRPCServer(config, store)
 
+}
+
+func runGatewayServer(config util.Config, store db.Store) {
+
+	server, err := gapi.NewServer(config, store)
+	if err != nil {
+		log.Fatal("cannot create gAPI server:", err)
+	}
+
+	jsonOption := runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
+		MarshalOptions: protojson.MarshalOptions{
+			UseProtoNames: true,
+		},
+		UnmarshalOptions: protojson.UnmarshalOptions{
+			DiscardUnknown: true,
+		},
+	})
+
+	gRPCMux := runtime.NewServeMux(jsonOption)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	err = pb.RegisterBankRPCServiceHandlerServer(ctx, gRPCMux, server)
+	if err != nil {
+		log.Fatal("cannot register handler server:", err)
+	}
+
+	mux := http.NewServeMux()
+	mux.Handle("/", gRPCMux)
+
+	listener, err := net.Listen("tcp", config.HTTPServerAddress)
+	if err != nil {
+		log.Fatal("cannot create net.Listener:", err)
+	}
+
+	log.Printf("starting HTTP gateway server at %s", listener.Addr())
+	err = http.Serve(listener, mux)
+	if err != nil {
+		log.Fatal("cannot start HTTP gateway server:", err)
+	}
 }
 
 func runGRPCServer(config util.Config, store db.Store) {
@@ -46,7 +92,7 @@ func runGRPCServer(config util.Config, store db.Store) {
 
 	listener, err := net.Listen("tcp", config.GRPCServerAddress)
 	if err != nil {
-		log.Fatal("cannot create net.Listener")
+		log.Fatal("cannot create net.Listener:", err)
 	}
 
 	log.Printf("start gRPC server at %s", listener.Addr())
