@@ -5,6 +5,7 @@ package pb;
 import "google/api/annotations.proto";
 import "rpc_create_user.proto";
 import "rpc_login_user.proto";
+import "rpc_create_account.proto";
 
 option go_package = "github.com/mdmn07C5/bank/pb";
 
@@ -18,6 +19,12 @@ service BankRPCService {
     rpc LoginUser (LoginUserRequest) returns (LoginUserResponse) {
 	    option (google.api.http) = {
 	        post: "/v1/login_user"
+			body: "*"
+	    };
+    }
+	rpc CreateAccount (CreateAccountRequest) returns (CreateAccountResponse) {
+	    option (google.api.http) = {
+	        post: "/v1/create_account"
 			body: "*"
 	    };
     }
