@@ -7,6 +7,7 @@ import "rpc_create_user.proto";
 import "rpc_login_user.proto";
 import "rpc_create_account.proto";
 import "rpc_get_account.proto";
+import "rpc_list_accounts.proto";
 
 option go_package = "github.com/mdmn07C5/bank/pb";
 
@@ -34,5 +35,9 @@ service BankRPCService {
 			get: "/v1/get_account/{id}"
 		};
 	}
-
+	rpc ListAccounts (ListAccountsRequest) returns (ListAccountsResponse) {
+		option (google.api.http) = {
+			get: "/v1/list_accounts"
+		};
+	}
 }

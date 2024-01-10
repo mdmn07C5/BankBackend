@@ -23,6 +23,7 @@ const (
 	BankRPCService_LoginUser_FullMethodName     = "/pb.BankRPCService/LoginUser"
 	BankRPCService_CreateAccount_FullMethodName = "/pb.BankRPCService/CreateAccount"
 	BankRPCService_GetAccount_FullMethodName    = "/pb.BankRPCService/GetAccount"
+	BankRPCService_ListAccounts_FullMethodName  = "/pb.BankRPCService/ListAccounts"
 )
 
 // BankRPCServiceClient is the client API for BankRPCService service.
@@ -33,6 +34,7 @@ type BankRPCServiceClient interface {
 	LoginUser(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*LoginUserResponse, error)
 	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*CreateAccountResponse, error)
 	GetAccount(ctx context.Context, in *GetAccountRequest, opts ...grpc.CallOption) (*GetAccountResponse, error)
+	ListAccounts(ctx context.Context, in *ListAccountsRequest, opts ...grpc.CallOption) (*ListAccountsResponse, error)
 }
 
 type bankRPCServiceClient struct {
@@ -79,6 +81,15 @@ func (c *bankRPCServiceClient) GetAccount(ctx context.Context, in *GetAccountReq
 	return out, nil
 }
 
+func (c *bankRPCServiceClient) ListAccounts(ctx context.Context, in *ListAccountsRequest, opts ...grpc.CallOption) (*ListAccountsResponse, error) {
+	out := new(ListAccountsResponse)
+	err := c.cc.Invoke(ctx, BankRPCService_ListAccounts_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BankRPCServiceServer is the server API for BankRPCService service.
 // All implementations must embed UnimplementedBankRPCServiceServer
 // for forward compatibility
@@ -87,6 +98,7 @@ type BankRPCServiceServer interface {
 	LoginUser(context.Context, *LoginUserRequest) (*LoginUserResponse, error)
 	CreateAccount(context.Context, *CreateAccountRequest) (*CreateAccountResponse, error)
 	GetAccount(context.Context, *GetAccountRequest) (*GetAccountResponse, error)
+	ListAccounts(context.Context, *ListAccountsRequest) (*ListAccountsResponse, error)
 	mustEmbedUnimplementedBankRPCServiceServer()
 }
 
@@ -105,6 +117,9 @@ func (UnimplementedBankRPCServiceServer) CreateAccount(context.Context, *CreateA
 }
 func (UnimplementedBankRPCServiceServer) GetAccount(context.Context, *GetAccountRequest) (*GetAccountResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAccount not implemented")
+}
+func (UnimplementedBankRPCServiceServer) ListAccounts(context.Context, *ListAccountsRequest) (*ListAccountsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListAccounts not implemented")
 }
 func (UnimplementedBankRPCServiceServer) mustEmbedUnimplementedBankRPCServiceServer() {}
 
@@ -191,6 +206,24 @@ func _BankRPCService_GetAccount_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BankRPCService_ListAccounts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAccountsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankRPCServiceServer).ListAccounts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankRPCService_ListAccounts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankRPCServiceServer).ListAccounts(ctx, req.(*ListAccountsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BankRPCService_ServiceDesc is the grpc.ServiceDesc for BankRPCService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -213,6 +246,10 @@ var BankRPCService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAccount",
 			Handler:    _BankRPCService_GetAccount_Handler,
+		},
+		{
+			MethodName: "ListAccounts",
+			Handler:    _BankRPCService_ListAccounts_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
