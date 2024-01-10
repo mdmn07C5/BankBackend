@@ -40,7 +40,7 @@ func main() {
 
 	go runGatewayServer(config, store)
 	runGRPCServer(config, store)
-
+	// runGinServer(config, store)
 }
 
 func runGatewayServer(config util.Config, store db.Store) {

@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	BankRPCService_CreateUser_FullMethodName = "/pb.BankRPCService/CreateUser"
-	BankRPCService_LoginUser_FullMethodName  = "/pb.BankRPCService/LoginUser"
+	BankRPCService_CreateUser_FullMethodName    = "/pb.BankRPCService/CreateUser"
+	BankRPCService_LoginUser_FullMethodName     = "/pb.BankRPCService/LoginUser"
+	BankRPCService_CreateAccount_FullMethodName = "/pb.BankRPCService/CreateAccount"
 )
 
 // BankRPCServiceClient is the client API for BankRPCService service.
@@ -29,6 +30,7 @@ const (
 type BankRPCServiceClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
 	LoginUser(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*LoginUserResponse, error)
+	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*CreateAccountResponse, error)
 }
 
 type bankRPCServiceClient struct {
@@ -57,12 +59,22 @@ func (c *bankRPCServiceClient) LoginUser(ctx context.Context, in *LoginUserReque
 	return out, nil
 }
 
+func (c *bankRPCServiceClient) CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*CreateAccountResponse, error) {
+	out := new(CreateAccountResponse)
+	err := c.cc.Invoke(ctx, BankRPCService_CreateAccount_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BankRPCServiceServer is the server API for BankRPCService service.
 // All implementations must embed UnimplementedBankRPCServiceServer
 // for forward compatibility
 type BankRPCServiceServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	LoginUser(context.Context, *LoginUserRequest) (*LoginUserResponse, error)
+	CreateAccount(context.Context, *CreateAccountRequest) (*CreateAccountResponse, error)
 	mustEmbedUnimplementedBankRPCServiceServer()
 }
 
@@ -75,6 +87,9 @@ func (UnimplementedBankRPCServiceServer) CreateUser(context.Context, *CreateUser
 }
 func (UnimplementedBankRPCServiceServer) LoginUser(context.Context, *LoginUserRequest) (*LoginUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LoginUser not implemented")
+}
+func (UnimplementedBankRPCServiceServer) CreateAccount(context.Context, *CreateAccountRequest) (*CreateAccountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateAccount not implemented")
 }
 func (UnimplementedBankRPCServiceServer) mustEmbedUnimplementedBankRPCServiceServer() {}
 
@@ -125,6 +140,24 @@ func _BankRPCService_LoginUser_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BankRPCService_CreateAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateAccountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankRPCServiceServer).CreateAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankRPCService_CreateAccount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankRPCServiceServer).CreateAccount(ctx, req.(*CreateAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BankRPCService_ServiceDesc is the grpc.ServiceDesc for BankRPCService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -139,6 +172,10 @@ var BankRPCService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LoginUser",
 			Handler:    _BankRPCService_LoginUser_Handler,
+		},
+		{
+			MethodName: "CreateAccount",
+			Handler:    _BankRPCService_CreateAccount_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
