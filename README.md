@@ -12,6 +12,9 @@ Run these commands in the root directory
 3. `make server` - to run the server
 
 ## API v1
+
+(documentation is also available at `localhost:8080/swagger`)
+
 The following APIs are available to the user, you may run the commands below (or use postman). 
 ### Create User
 ```sh
