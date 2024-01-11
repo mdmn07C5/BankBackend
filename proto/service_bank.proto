@@ -9,6 +9,7 @@ import "rpc_create_account.proto";
 import "rpc_get_account.proto";
 import "rpc_list_accounts.proto";
 import "rpc_renew_access_token.proto";
+import "rpc_transfer_funds.proto";
 
 option go_package = "github.com/mdmn07C5/bank/pb";
 
@@ -44,6 +45,12 @@ service BankRPCService {
 	rpc RenewAccessToken (RenewAccessTokenRequest) returns (RenewAccessTokenResponse) {
 		option (google.api.http) = {
 			post: "/v1/renew_access_token"
+			body: "*"
+		};
+	}
+	rpc TransferFunds (TransferRequest) returns (TransferResponse) {
+		option (google.api.http) = {
+			post: "/v1/transfer_funds"
 			body: "*"
 		};
 	}
