@@ -6,65 +6,87 @@ A bank application's backend
 Run these commands in the root directory
 1. `make postgres` - to run a postgres image on docker
 2. `make createdb` - to create the database
-3. `make migrate` - to create the db schema, initial seed data will be provided on running the server
-4. `make server` - to run the server
 
-## API
+~~3. `make migrate` - to create the db schema, initial seed data will be provided on running the server~~
+   
+3. `make server` - to run the server
+
+## API v1
 The following APIs are available to the user, you may run the commands below (or use postman). 
 ### Create User
-```shell
-curl --header "Content-Type: application/json" \
-    --request POST \
-    --data '{"username":"<username>", "full_name":"<full name>", "email":"<email>", "password":"password"}' \
-    http://localhost:8080/users
+```sh
+curl --request POST 'http://localhost:8080/v1/create_user' \
+    --header 'Content-Type: application/json' \
+    --data-raw '{
+        "username": "<username>",
+        "full_name": "<full_name>",
+        "email": "<email>",
+        "password": "<password>"
+    }'
 ```
 I've provided 2 users with multiple accounts: (username: peepo, password: password123) and (username: gondola, password: password123)
 
 ### Login
-```shell
-curl --header "Content-Type: application/json" \
-    --request POST \
-    --data '{"username":"<username>", "password":"<password>"}' \
-    http://localhost:8080/users/login
+```sh
+curl --request POST 'http://localhost:8080/v1/login_user' \
+    --header 'Content-Type: application/json' \
+    --data '{
+        "username": "<username>",
+        "password": "<password>"
+    }'
 ```
 
 ### Create Account
 Create accounts for logged in user
-```shell
- curl --header "Content-Type: application/json" \
-    --header "Authorization: Bearer <your header token>" \
-    --request POST \
-    --data '{"currency":"<chosen currency>"}' \
-    http://localhost:8080/accounts
+```sh
+curl --request POST 'http://localhost:8080/v1/create_account' \
+    --header 'Content-Type: application/json' \
+    --header 'Authorization: Bearer <your_token>' \
+    --data '{
+        "owner":"<full_name>",
+        "currency":"<currency>"
+    }'
 ```
 
-### #Get Accounts
-Get accounts associated with user
+### Get Account
+Get account by id
+```sh
+curl --request GET 'http://localhost:8080/v1/get_account/2' \
+    --header 'Authorization: Bearer <your_token>'
+```
+
+### List Accounts
+List accounts associated with user
 ```shell 
-curl --header "Content-Type: application/json" \
-    --header "Authorization: Bearer <your header token>" \
-    --request GET \
-    http://localhost:8080/accounts/?page_id=1&page_size=10
+curl --request GET 'http://localhost:8080/v1/list_accounts?page_id=<start_page>&page_size=<page_size>' \
+    --header 'Authorization: Bearer <your_token>'
 ```
 
 ### Transfer
 Transfer money from logged in user's account, to any other account with matching currency
-```shell
-curl --header "Content-Type: application/json" \
-    --header "Authorization: Bearer <your header token>" \
-    --request POST \
-    --data '{"from_account_id": "<from account id>", "to_account_id": "<to account id>", "amount":"<amount>", "currency": "<currency>"}' \
-    http://localhost:8080/transfers 
+```sh
+curl --request POST 'http://localhost:8080/v1/transfer_funds' \
+    --header 'Content-Type: application/json' \
+    --header 'Authorization: Bearer <your_token>' \
+    --data '{
+        "from_account_id": <from_account_id>,
+        "to_account_id": <to_account_id>,
+        "amount": <amount>,
+        "currency": <currency>
+    }'
 ```
 
 ### Refresh Access Token 
 ```shell
-curl --header "Content-Type: application/json" \
-    --request POST \
-    --data '{"refresh_token":"<refresh token>"}' \
-    http://localhost:8080/tokens/renew_access
+curl -request POST 'http://localhost:8080/v1/renew_access_token' \
+    --header 'Content-Type: application/json' \
+    --data '{
+        "refresh_token": "<your refresh token"
+    }'
 ```
+refresh_token is acquired from the login response
 
+## v0
 ### Logout
 ```shell
 curl --header "Content-Type: application/json" \
