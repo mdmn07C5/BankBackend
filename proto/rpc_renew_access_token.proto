@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/mdmn07C5/bank/pb";
+
+message RenewAccessTokenRequest {
+    string refresh_token = 1;
+}
+
+message RenewAccessTokenResponse {
+    string access_token = 1;
+    google.protobuf.Timestamp expires_at = 5;
+
+}

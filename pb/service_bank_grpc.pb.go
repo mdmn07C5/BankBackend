@@ -19,11 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	BankRPCService_CreateUser_FullMethodName    = "/pb.BankRPCService/CreateUser"
-	BankRPCService_LoginUser_FullMethodName     = "/pb.BankRPCService/LoginUser"
-	BankRPCService_CreateAccount_FullMethodName = "/pb.BankRPCService/CreateAccount"
-	BankRPCService_GetAccount_FullMethodName    = "/pb.BankRPCService/GetAccount"
-	BankRPCService_ListAccounts_FullMethodName  = "/pb.BankRPCService/ListAccounts"
+	BankRPCService_CreateUser_FullMethodName       = "/pb.BankRPCService/CreateUser"
+	BankRPCService_LoginUser_FullMethodName        = "/pb.BankRPCService/LoginUser"
+	BankRPCService_CreateAccount_FullMethodName    = "/pb.BankRPCService/CreateAccount"
+	BankRPCService_GetAccount_FullMethodName       = "/pb.BankRPCService/GetAccount"
+	BankRPCService_ListAccounts_FullMethodName     = "/pb.BankRPCService/ListAccounts"
+	BankRPCService_RenewAccessToken_FullMethodName = "/pb.BankRPCService/RenewAccessToken"
 )
 
 // BankRPCServiceClient is the client API for BankRPCService service.
@@ -35,6 +36,7 @@ type BankRPCServiceClient interface {
 	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*CreateAccountResponse, error)
 	GetAccount(ctx context.Context, in *GetAccountRequest, opts ...grpc.CallOption) (*GetAccountResponse, error)
 	ListAccounts(ctx context.Context, in *ListAccountsRequest, opts ...grpc.CallOption) (*ListAccountsResponse, error)
+	RenewAccessToken(ctx context.Context, in *RenewAccessTokenRequest, opts ...grpc.CallOption) (*RenewAccessTokenResponse, error)
 }
 
 type bankRPCServiceClient struct {
@@ -90,6 +92,15 @@ func (c *bankRPCServiceClient) ListAccounts(ctx context.Context, in *ListAccount
 	return out, nil
 }
 
+func (c *bankRPCServiceClient) RenewAccessToken(ctx context.Context, in *RenewAccessTokenRequest, opts ...grpc.CallOption) (*RenewAccessTokenResponse, error) {
+	out := new(RenewAccessTokenResponse)
+	err := c.cc.Invoke(ctx, BankRPCService_RenewAccessToken_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BankRPCServiceServer is the server API for BankRPCService service.
 // All implementations must embed UnimplementedBankRPCServiceServer
 // for forward compatibility
@@ -99,6 +110,7 @@ type BankRPCServiceServer interface {
 	CreateAccount(context.Context, *CreateAccountRequest) (*CreateAccountResponse, error)
 	GetAccount(context.Context, *GetAccountRequest) (*GetAccountResponse, error)
 	ListAccounts(context.Context, *ListAccountsRequest) (*ListAccountsResponse, error)
+	RenewAccessToken(context.Context, *RenewAccessTokenRequest) (*RenewAccessTokenResponse, error)
 	mustEmbedUnimplementedBankRPCServiceServer()
 }
 
@@ -120,6 +132,9 @@ func (UnimplementedBankRPCServiceServer) GetAccount(context.Context, *GetAccount
 }
 func (UnimplementedBankRPCServiceServer) ListAccounts(context.Context, *ListAccountsRequest) (*ListAccountsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListAccounts not implemented")
+}
+func (UnimplementedBankRPCServiceServer) RenewAccessToken(context.Context, *RenewAccessTokenRequest) (*RenewAccessTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RenewAccessToken not implemented")
 }
 func (UnimplementedBankRPCServiceServer) mustEmbedUnimplementedBankRPCServiceServer() {}
 
@@ -224,6 +239,24 @@ func _BankRPCService_ListAccounts_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BankRPCService_RenewAccessToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RenewAccessTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankRPCServiceServer).RenewAccessToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankRPCService_RenewAccessToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankRPCServiceServer).RenewAccessToken(ctx, req.(*RenewAccessTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BankRPCService_ServiceDesc is the grpc.ServiceDesc for BankRPCService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -250,6 +283,10 @@ var BankRPCService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListAccounts",
 			Handler:    _BankRPCService_ListAccounts_Handler,
+		},
+		{
+			MethodName: "RenewAccessToken",
+			Handler:    _BankRPCService_RenewAccessToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

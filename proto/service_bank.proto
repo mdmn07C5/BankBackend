@@ -8,6 +8,7 @@ import "rpc_login_user.proto";
 import "rpc_create_account.proto";
 import "rpc_get_account.proto";
 import "rpc_list_accounts.proto";
+import "rpc_renew_access_token.proto";
 
 option go_package = "github.com/mdmn07C5/bank/pb";
 
@@ -38,6 +39,12 @@ service BankRPCService {
 	rpc ListAccounts (ListAccountsRequest) returns (ListAccountsResponse) {
 		option (google.api.http) = {
 			get: "/v1/list_accounts"
+		};
+	}
+	rpc RenewAccessToken (RenewAccessTokenRequest) returns (RenewAccessTokenResponse) {
+		option (google.api.http) = {
+			post: "/v1/renew_access_token"
+			body: "*"
 		};
 	}
 }
