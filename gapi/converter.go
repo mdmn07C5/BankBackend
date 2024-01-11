@@ -25,3 +25,30 @@ func convertAccount(account db.Account) *pb.Account {
 		CreatedAt: timestamppb.New(account.CreatedAt),
 	}
 }
+
+func convertEntry(entry db.Entry) *pb.Entry {
+	return &pb.Entry{
+		Id:        entry.ID,
+		AccountId: entry.AccountID,
+		Amount:    entry.Amount,
+		CreatedAt: timestamppb.New(entry.CreatedAt),
+	}
+}
+
+func convertTransferResult(transferResult db.TransferTxResult) *pb.TransferResponse {
+	transfer := &pb.Transfer{
+		Id:            transferResult.Transfer.ID,
+		FromAccountId: transferResult.Transfer.FromAccountID,
+		ToAccountId:   transferResult.Transfer.ToAccountID,
+		Amount:        transferResult.Transfer.Amount,
+		CreatedAt:     timestamppb.New(transferResult.Transfer.CreatedAt),
+	}
+
+	return &pb.TransferResponse{
+		Transfer:    transfer,
+		FromAccount: convertAccount(transferResult.FromAccount),
+		ToAccount:   convertAccount(transferResult.ToAccount),
+		FromEntry:   convertEntry(transferResult.FromEntry),
+		ToEntry:     convertEntry(transferResult.ToEntry),
+	}
+}
