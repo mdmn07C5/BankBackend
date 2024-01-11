@@ -223,3 +223,14 @@ func (server *Server) logoutUser(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, rsp)
 }
+
+type updateUserRequest struct {
+	Username string `json:"username" binding:"required,alphanum"`
+	Password string `json:"password" binding:"min=8"`
+	FullName string `json:"full_name" binding:"full_name"`
+	Email    string `json:"email" binding:"email"`
+}
+
+func (server *Server) UpdateUser(ctx *gin.Context) {
+
+}
