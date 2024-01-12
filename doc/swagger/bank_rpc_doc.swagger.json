@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Bank API",
-    "version": "1.0",
+    "version": "1.6",
     "contact": {
       "name": "Bank Backend",
       "url": "https://github.com/mdmn07C5/BankBackend"
@@ -248,6 +248,38 @@
           "BankRPCService"
         ]
       }
+    },
+    "/v1/update_user": {
+      "patch": {
+        "operationId": "BankRPCService_UpdateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbUpdateUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbUpdateUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BankRPCService"
+        ]
+      }
     }
   },
   "definitions": {
@@ -474,6 +506,31 @@
         },
         "toEntry": {
           "$ref": "#/definitions/pbEntry"
+        }
+      }
+    },
+    "pbUpdateUserRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "fullName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "pbUpdateUserResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/pbUser"
         }
       }
     },
