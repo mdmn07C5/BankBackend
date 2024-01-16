@@ -118,7 +118,7 @@ func TestCreateUserAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "Internal Error",
+			name: "InternalError",
 			req: &pb.CreateUserRequest{
 				Username: user.Username,
 				Password: password,
@@ -139,7 +139,7 @@ func TestCreateUserAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "User Already Exists",
+			name: "UserAlreadyExists",
 			req: &pb.CreateUserRequest{
 				Username: user.Username,
 				Password: password,
@@ -156,6 +156,86 @@ func TestCreateUserAPI(t *testing.T) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.Equal(t, codes.AlreadyExists, st.Code())
+				require.True(t, ok)
+			},
+		},
+		{
+			name: "InvalidUsername",
+			req: &pb.CreateUserRequest{
+				Username: "invalid%username",
+				Password: password,
+				FullName: user.FullName,
+				Email:    user.Email,
+			},
+			buildStubs: func(mockStore *mockdb.MockStore) {
+				mockStore.EXPECT().
+					CreateUser(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, res *pb.CreateUserResponse, err error) {
+				require.Error(t, err)
+				st, ok := status.FromError(err)
+				require.Equal(t, codes.InvalidArgument, st.Code())
+				require.True(t, ok)
+			},
+		},
+		{
+			name: "InvalidPassword",
+			req: &pb.CreateUserRequest{
+				Username: user.Username,
+				Password: "a",
+				FullName: user.FullName,
+				Email:    user.Email,
+			},
+			buildStubs: func(mockStore *mockdb.MockStore) {
+				mockStore.EXPECT().
+					CreateUser(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, res *pb.CreateUserResponse, err error) {
+				require.Error(t, err)
+				st, ok := status.FromError(err)
+				require.Equal(t, codes.InvalidArgument, st.Code())
+				require.True(t, ok)
+			},
+		},
+		{
+			name: "InvalidFullname",
+			req: &pb.CreateUserRequest{
+				Username: user.Username,
+				Password: password,
+				FullName: "invalid^fullname",
+				Email:    user.Email,
+			},
+			buildStubs: func(mockStore *mockdb.MockStore) {
+				mockStore.EXPECT().
+					CreateUser(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, res *pb.CreateUserResponse, err error) {
+				require.Error(t, err)
+				st, ok := status.FromError(err)
+				require.Equal(t, codes.InvalidArgument, st.Code())
+				require.True(t, ok)
+			},
+		},
+		{
+			name: "InvalidEmail",
+			req: &pb.CreateUserRequest{
+				Username: user.Username,
+				Password: password,
+				FullName: user.FullName,
+				Email:    "invalid email",
+			},
+			buildStubs: func(mockStore *mockdb.MockStore) {
+				mockStore.EXPECT().
+					CreateUser(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, res *pb.CreateUserResponse, err error) {
+				require.Error(t, err)
+				st, ok := status.FromError(err)
+				require.Equal(t, codes.InvalidArgument, st.Code())
 				require.True(t, ok)
 			},
 		},
