@@ -58,14 +58,14 @@ func ValidateFullName(value string) error {
 	return nil
 }
 
-func ValidatePageID(value int) error {
+func ValidatePageID(value int32) error {
 	if value < 1 {
 		return fmt.Errorf("page must be greater than 1")
 	}
 	return nil
 }
 
-func ValidatePageSize(value int) error {
+func ValidatePageSize(value int32) error {
 	if maxPageSize < value || value < minPageSize {
 		return fmt.Errorf("page size must be between %d and %d", minPageSize, maxPageSize)
 	}
