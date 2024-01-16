@@ -6,6 +6,11 @@ import (
 	"regexp"
 )
 
+const (
+	minPageSize = 5
+	maxPageSize = 10
+)
+
 var (
 	isValidUsername = regexp.MustCompile(`^[a-z0-9_]+$`).MatchString
 	isValidFullName = regexp.MustCompile(`^[a-zA-Z\s]+$`).MatchString
@@ -49,6 +54,20 @@ func ValidateFullName(value string) error {
 	}
 	if !isValidFullName(value) {
 		return fmt.Errorf("must contain only letters or spaces")
+	}
+	return nil
+}
+
+func ValidatePageID(value int) error {
+	if value < 1 {
+		return fmt.Errorf("page must be greater than 1")
+	}
+	return nil
+}
+
+func ValidatePageSize(value int) error {
+	if maxPageSize < value || value < minPageSize {
+		return fmt.Errorf("page size must be between %d and %d", minPageSize, maxPageSize)
 	}
 	return nil
 }
