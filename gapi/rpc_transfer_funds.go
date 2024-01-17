@@ -19,6 +19,10 @@ func (server *Server) TransferFunds(ctx context.Context, req *pb.TransferRequest
 	}
 
 	authPayload, err := server.authorizeUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	if fromAccount.Owner != authPayload.Username {
 		err := errors.New("from account does not belong to the authenticated user")
 		return nil, unauthenticatedError(err)
