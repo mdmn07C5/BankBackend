@@ -4,6 +4,8 @@ import (
 	"context"
 
 	db "github.com/mdmn07C5/bank/db/sqlc"
+	"github.com/mdmn07C5/bank/val"
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -14,6 +16,10 @@ func (server *Server) ListAccounts(ctx context.Context, req *pb.ListAccountsRequ
 	authPayload, err := server.authorizeUser(ctx)
 	if err != nil {
 		return nil, unauthenticatedError(err)
+	}
+
+	if violations := validateListAccountRequest(req); violations != nil {
+		return nil, invalidArgumentError(violations)
 	}
 
 	arg := db.ListAccountsParams{
@@ -35,4 +41,16 @@ func (server *Server) ListAccounts(ctx context.Context, req *pb.ListAccountsRequ
 		Accounts: accs,
 	}
 	return rsp, nil
+}
+
+func validateListAccountRequest(req *pb.ListAccountsRequest) (violations []*errdetails.BadRequest_FieldViolation) {
+	if err := val.ValidatePageID(req.GetPageId()); err != nil {
+		violations = append(violations, fieldViolation("page_id", err))
+	}
+
+	if err := val.ValidatePageSize(req.GetPageSize()); err != nil {
+		violations = append(violations, fieldViolation("page_size", err))
+	}
+
+	return violations
 }

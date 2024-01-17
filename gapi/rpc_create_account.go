@@ -4,6 +4,7 @@ import (
 	"context"
 
 	db "github.com/mdmn07C5/bank/db/sqlc"
+	"github.com/mdmn07C5/bank/util"
 
 	"github.com/lib/pq"
 	"github.com/mdmn07C5/bank/pb"
@@ -17,9 +18,14 @@ func (server *Server) CreateAccount(ctx context.Context, req *pb.CreateAccountRe
 		return nil, unauthenticatedError(err)
 	}
 
+	currency := req.GetCurrency()
+	if ok := util.IsSupportedCurrency(currency); !ok {
+		return nil, status.Errorf(codes.InvalidArgument, "currency not supported: %s", currency)
+	}
+
 	arg := db.CreateAccountParams{
 		Owner:    authPayload.Username,
-		Currency: req.GetCurrency(),
+		Currency: currency,
 		Balance:  0,
 	}
 
