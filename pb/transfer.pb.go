@@ -7,9 +7,9 @@
 package pb
 
 import (
-	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -26,11 +26,11 @@ type Transfer struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id            int64                `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	FromAccountId int64                `protobuf:"varint,2,opt,name=from_account_id,json=fromAccountId,proto3" json:"from_account_id,omitempty"`
-	ToAccountId   int64                `protobuf:"varint,3,opt,name=to_account_id,json=toAccountId,proto3" json:"to_account_id,omitempty"`
-	Amount        int64                `protobuf:"varint,4,opt,name=amount,proto3" json:"amount,omitempty"`
-	CreatedAt     *timestamp.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	FromAccountId int64                  `protobuf:"varint,2,opt,name=from_account_id,json=fromAccountId,proto3" json:"from_account_id,omitempty"`
+	ToAccountId   int64                  `protobuf:"varint,3,opt,name=to_account_id,json=toAccountId,proto3" json:"to_account_id,omitempty"`
+	Amount        int64                  `protobuf:"varint,4,opt,name=amount,proto3" json:"amount,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 }
 
 func (x *Transfer) Reset() {
@@ -93,7 +93,7 @@ func (x *Transfer) GetAmount() int64 {
 	return 0
 }
 
-func (x *Transfer) GetCreatedAt() *timestamp.Timestamp {
+func (x *Transfer) GetCreatedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.CreatedAt
 	}
@@ -137,8 +137,8 @@ func file_transfer_proto_rawDescGZIP() []byte {
 
 var file_transfer_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_transfer_proto_goTypes = []interface{}{
-	(*Transfer)(nil),            // 0: pb.Transfer
-	(*timestamp.Timestamp)(nil), // 1: google.protobuf.Timestamp
+	(*Transfer)(nil),              // 0: pb.Transfer
+	(*timestamppb.Timestamp)(nil), // 1: google.protobuf.Timestamp
 }
 var file_transfer_proto_depIdxs = []int32{
 	1, // 0: pb.Transfer.created_at:type_name -> google.protobuf.Timestamp

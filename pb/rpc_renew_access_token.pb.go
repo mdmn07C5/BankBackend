@@ -7,9 +7,9 @@
 package pb
 
 import (
-	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -73,8 +73,8 @@ type RenewAccessTokenResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	AccessToken string               `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
-	ExpiresAt   *timestamp.Timestamp `protobuf:"bytes,5,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	AccessToken string                 `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
+	ExpiresAt   *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
 }
 
 func (x *RenewAccessTokenResponse) Reset() {
@@ -116,7 +116,7 @@ func (x *RenewAccessTokenResponse) GetAccessToken() string {
 	return ""
 }
 
-func (x *RenewAccessTokenResponse) GetExpiresAt() *timestamp.Timestamp {
+func (x *RenewAccessTokenResponse) GetExpiresAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.ExpiresAt
 	}
@@ -163,7 +163,7 @@ var file_rpc_renew_access_token_proto_msgTypes = make([]protoimpl.MessageInfo, 2
 var file_rpc_renew_access_token_proto_goTypes = []interface{}{
 	(*RenewAccessTokenRequest)(nil),  // 0: pb.RenewAccessTokenRequest
 	(*RenewAccessTokenResponse)(nil), // 1: pb.RenewAccessTokenResponse
-	(*timestamp.Timestamp)(nil),      // 2: google.protobuf.Timestamp
+	(*timestamppb.Timestamp)(nil),    // 2: google.protobuf.Timestamp
 }
 var file_rpc_renew_access_token_proto_depIdxs = []int32{
 	2, // 0: pb.RenewAccessTokenResponse.expires_at:type_name -> google.protobuf.Timestamp

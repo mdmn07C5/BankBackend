@@ -7,9 +7,9 @@
 package pb
 
 import (
-	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -26,10 +26,10 @@ type Entry struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id        int64                `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	AccountId int64                `protobuf:"varint,2,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
-	Amount    int64                `protobuf:"varint,3,opt,name=amount,proto3" json:"amount,omitempty"`
-	CreatedAt *timestamp.Timestamp `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Id        int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	AccountId int64                  `protobuf:"varint,2,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
+	Amount    int64                  `protobuf:"varint,3,opt,name=amount,proto3" json:"amount,omitempty"`
+	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 }
 
 func (x *Entry) Reset() {
@@ -85,7 +85,7 @@ func (x *Entry) GetAmount() int64 {
 	return 0
 }
 
-func (x *Entry) GetCreatedAt() *timestamp.Timestamp {
+func (x *Entry) GetCreatedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.CreatedAt
 	}
@@ -126,8 +126,8 @@ func file_entry_proto_rawDescGZIP() []byte {
 
 var file_entry_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_entry_proto_goTypes = []interface{}{
-	(*Entry)(nil),               // 0: pb.Entry
-	(*timestamp.Timestamp)(nil), // 1: google.protobuf.Timestamp
+	(*Entry)(nil),                 // 0: pb.Entry
+	(*timestamppb.Timestamp)(nil), // 1: google.protobuf.Timestamp
 }
 var file_entry_proto_depIdxs = []int32{
 	1, // 0: pb.Entry.created_at:type_name -> google.protobuf.Timestamp

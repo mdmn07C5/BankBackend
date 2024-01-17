@@ -7,9 +7,9 @@
 package pb
 
 import (
-	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -26,11 +26,11 @@ type Account struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id        int64                `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Owner     string               `protobuf:"bytes,2,opt,name=owner,proto3" json:"owner,omitempty"`
-	Balance   int64                `protobuf:"varint,3,opt,name=balance,proto3" json:"balance,omitempty"`
-	Currency  string               `protobuf:"bytes,4,opt,name=currency,proto3" json:"currency,omitempty"`
-	CreatedAt *timestamp.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Id        int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Owner     string                 `protobuf:"bytes,2,opt,name=owner,proto3" json:"owner,omitempty"`
+	Balance   int64                  `protobuf:"varint,3,opt,name=balance,proto3" json:"balance,omitempty"`
+	Currency  string                 `protobuf:"bytes,4,opt,name=currency,proto3" json:"currency,omitempty"`
+	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 }
 
 func (x *Account) Reset() {
@@ -93,7 +93,7 @@ func (x *Account) GetCurrency() string {
 	return ""
 }
 
-func (x *Account) GetCreatedAt() *timestamp.Timestamp {
+func (x *Account) GetCreatedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.CreatedAt
 	}
@@ -135,8 +135,8 @@ func file_account_proto_rawDescGZIP() []byte {
 
 var file_account_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_account_proto_goTypes = []interface{}{
-	(*Account)(nil),             // 0: pb.Account
-	(*timestamp.Timestamp)(nil), // 1: google.protobuf.Timestamp
+	(*Account)(nil),               // 0: pb.Account
+	(*timestamppb.Timestamp)(nil), // 1: google.protobuf.Timestamp
 }
 var file_account_proto_depIdxs = []int32{
 	1, // 0: pb.Account.created_at:type_name -> google.protobuf.Timestamp
