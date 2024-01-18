@@ -33,7 +33,8 @@ server:
 
 mock:
 	mockgen -package mockdb -destination db/mock/store.go github.com/mdmn07C5/bank/db/sqlc Store
-
+	mockgen -package mockwk -destination worker/mock/distributor.go github.com/mdmn07C5/bank/worker TaskDistributor
+	
 testAPI:
 	go test -v github.com/mdmn07C5/bank/api
 
@@ -49,4 +50,7 @@ proto:
 evans: 
 	evans --host localhost --port 9090 -r repl
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc test server mock testAPI migrateup1 migratedown1 proto evans
+redis:
+	docker run --name redis -p 6379:6379 -d redis:7-alpine
+
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc test server mock testAPI migrateup1 migratedown1 proto evans redis

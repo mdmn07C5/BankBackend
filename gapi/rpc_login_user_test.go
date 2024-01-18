@@ -8,6 +8,7 @@ import (
 	"github.com/golang/mock/gomock"
 	mockdb "github.com/mdmn07C5/bank/db/mock"
 	"github.com/mdmn07C5/bank/pb"
+	mockwk "github.com/mdmn07C5/bank/worker/mock"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -131,9 +132,13 @@ func TestLoginUserAPI(t *testing.T) {
 			defer ctrl.Finish()
 			mockStore := mockdb.NewMockStore(ctrl)
 
-			tc.buildStubs(mockStore)
+			tskCtrl := gomock.NewController(t)
+			defer ctrl.Finish()
+			taskDistributor := mockwk.NewMockTaskDistributor(tskCtrl)
 
-			server := newTestServer(t, mockStore)
+			tc.buildStubs(mockStore)
+			server := newTestServer(t, mockStore, taskDistributor)
+
 			res, err := server.LoginUser(context.Background(), tc.req)
 			tc.checkResponse(t, res, err)
 		})
