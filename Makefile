@@ -33,7 +33,8 @@ server:
 
 mock:
 	mockgen -package mockdb -destination db/mock/store.go github.com/mdmn07C5/bank/db/sqlc Store
-
+	mockgen -package mockwk -destination worker/mock/distributor.go github.com/mdmn07C5/bank/worker TaskDistributor
+	
 testAPI:
 	go test -v github.com/mdmn07C5/bank/api
 
