@@ -11,6 +11,7 @@ import (
 	mockdb "github.com/mdmn07C5/bank/db/mock"
 	db "github.com/mdmn07C5/bank/db/sqlc"
 	"github.com/mdmn07C5/bank/token"
+	mockwk "github.com/mdmn07C5/bank/worker/mock"
 
 	"github.com/mdmn07C5/bank/pb"
 	"github.com/stretchr/testify/require"
@@ -163,8 +164,12 @@ func TestListAccountsAPI(t *testing.T) {
 			defer ctrl.Finish()
 			mockStore := mockdb.NewMockStore(ctrl)
 
+			tskCtrl := gomock.NewController(t)
+			defer ctrl.Finish()
+			taskDistributor := mockwk.NewMockTaskDistributor(tskCtrl)
+
 			tc.buildStubs(mockStore)
-			server := newTestServer(t, mockStore)
+			server := newTestServer(t, mockStore, taskDistributor)
 
 			ctx := tc.buildContext(t, server.tokenMaker)
 			res, err := server.ListAccounts(ctx, tc.req)
