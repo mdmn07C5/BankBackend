@@ -108,12 +108,12 @@ func TestAuthMiddleWare(t *testing.T) {
 
 			tc.setupAuth(t, request, server.tokenMaker)
 			server.router.ServeHTTP(recorder, request)
-			fmt.Println(request)
 			tc.checkResponse(t, recorder)
 		})
 	}
 }
 
+// TODO: Actually fucking fix this test
 func TestSessionMiddleWare(t *testing.T) {
 	user, _ := randomUser(t)
 
@@ -203,7 +203,7 @@ func TestSessionMiddleWare(t *testing.T) {
 			server.store.GetSession(context.Background(), session.ID)
 
 			server.router.ServeHTTP(recorder, request)
-			fmt.Println(request)
+
 			// tc.checkResponse(t, recorder)
 		})
 	}
