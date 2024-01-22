@@ -26,7 +26,7 @@ gotest:
 	go test -timeout 30s github.com/mdmn07C5/bank/db/sqlc -run ^TestMain$
 
 test:
-	go test -v -cover ./...
+	go test -v -cover -short ./...
 
 server:
 	go run main.go
