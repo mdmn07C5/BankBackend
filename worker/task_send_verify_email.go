@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	db "github.com/mdmn07C5/bank/db/sqlc"
+	"github.com/mdmn07C5/bank/util"
 	"github.com/rs/zerolog/log"
 
 	"github.com/hibiken/asynq"
@@ -51,7 +53,35 @@ func (processor *RedisTaskProcessor) ProcessTaskSendVerifyEmail(ctx context.Cont
 		return fmt.Errorf("failed to get user: %w", err)
 	}
 
-	// TODO: send email to user
+	verifyEmailObject, err := processor.store.CreateVerifyEmail(ctx, db.CreateVerifyEmailParams{
+		Username:   user.Username,
+		Email:      user.Email,
+		SecretCode: util.RandomString(32),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to create verify email object: %w", err)
+	}
+
+	config, err := util.LoadConfig("..")
+	if err != nil {
+		return fmt.Errorf("failed to get server address: %w", err)
+	}
+	serverAddress := config.HTTPServerAddress
+
+	subject := "Verification Email"
+	verifyURL := fmt.Sprintf("%s/v1/verify_email?email_id=%d&secret_code=%s",
+		serverAddress, verifyEmailObject.ID, verifyEmailObject.SecretCode)
+	content := fmt.Sprintf(`Hello %s,<br/>
+	Thank you for registering with us!<br/>
+	Please verify your email using this URL: %s<br/>
+	`, user.FullName, verifyURL)
+
+	to := []string{user.Email}
+
+	err = processor.mailer.SendEmail(subject, content, to, nil, nil, nil)
+	if err != nil {
+		return fmt.Errorf("failed to send verification email: %w", err)
+	}
 
 	log.Info().Str("type", task.Type()).
 		Bytes("payload", task.Payload()).
