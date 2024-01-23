@@ -27,6 +27,7 @@ const (
 	BankRPCService_RenewAccessToken_FullMethodName = "/pb.BankRPCService/RenewAccessToken"
 	BankRPCService_TransferFunds_FullMethodName    = "/pb.BankRPCService/TransferFunds"
 	BankRPCService_UpdateUser_FullMethodName       = "/pb.BankRPCService/UpdateUser"
+	BankRPCService_VerifyEmail_FullMethodName      = "/pb.BankRPCService/VerifyEmail"
 )
 
 // BankRPCServiceClient is the client API for BankRPCService service.
@@ -41,6 +42,7 @@ type BankRPCServiceClient interface {
 	RenewAccessToken(ctx context.Context, in *RenewAccessTokenRequest, opts ...grpc.CallOption) (*RenewAccessTokenResponse, error)
 	TransferFunds(ctx context.Context, in *TransferRequest, opts ...grpc.CallOption) (*TransferResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
+	VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*VerifyEmailResponse, error)
 }
 
 type bankRPCServiceClient struct {
@@ -123,6 +125,15 @@ func (c *bankRPCServiceClient) UpdateUser(ctx context.Context, in *UpdateUserReq
 	return out, nil
 }
 
+func (c *bankRPCServiceClient) VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*VerifyEmailResponse, error) {
+	out := new(VerifyEmailResponse)
+	err := c.cc.Invoke(ctx, BankRPCService_VerifyEmail_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BankRPCServiceServer is the server API for BankRPCService service.
 // All implementations must embed UnimplementedBankRPCServiceServer
 // for forward compatibility
@@ -135,6 +146,7 @@ type BankRPCServiceServer interface {
 	RenewAccessToken(context.Context, *RenewAccessTokenRequest) (*RenewAccessTokenResponse, error)
 	TransferFunds(context.Context, *TransferRequest) (*TransferResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
+	VerifyEmail(context.Context, *VerifyEmailRequest) (*VerifyEmailResponse, error)
 	mustEmbedUnimplementedBankRPCServiceServer()
 }
 
@@ -165,6 +177,9 @@ func (UnimplementedBankRPCServiceServer) TransferFunds(context.Context, *Transfe
 }
 func (UnimplementedBankRPCServiceServer) UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
+}
+func (UnimplementedBankRPCServiceServer) VerifyEmail(context.Context, *VerifyEmailRequest) (*VerifyEmailResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyEmail not implemented")
 }
 func (UnimplementedBankRPCServiceServer) mustEmbedUnimplementedBankRPCServiceServer() {}
 
@@ -323,6 +338,24 @@ func _BankRPCService_UpdateUser_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BankRPCService_VerifyEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyEmailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BankRPCServiceServer).VerifyEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BankRPCService_VerifyEmail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BankRPCServiceServer).VerifyEmail(ctx, req.(*VerifyEmailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BankRPCService_ServiceDesc is the grpc.ServiceDesc for BankRPCService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -361,6 +394,10 @@ var BankRPCService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateUser",
 			Handler:    _BankRPCService_UpdateUser_Handler,
+		},
+		{
+			MethodName: "VerifyEmail",
+			Handler:    _BankRPCService_VerifyEmail_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
