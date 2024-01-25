@@ -37,7 +37,7 @@ type CreateSessionParams struct {
 }
 
 func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error) {
-	row := q.db.QueryRowContext(ctx, createSession,
+	row := q.db.QueryRow(ctx, createSession,
 		arg.ID,
 		arg.Username,
 		arg.RefreshToken,
@@ -66,7 +66,7 @@ WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetSession(ctx context.Context, id uuid.UUID) (Session, error) {
-	row := q.db.QueryRowContext(ctx, getSession, id)
+	row := q.db.QueryRow(ctx, getSession, id)
 	var i Session
 	err := row.Scan(
 		&i.ID,
@@ -88,7 +88,7 @@ FOR NO KEY UPDATE
 `
 
 func (q *Queries) GetSessionForUpdate(ctx context.Context, id uuid.UUID) (Session, error) {
-	row := q.db.QueryRowContext(ctx, getSessionForUpdate, id)
+	row := q.db.QueryRow(ctx, getSessionForUpdate, id)
 	var i Session
 	err := row.Scan(
 		&i.ID,
@@ -117,7 +117,7 @@ type UpdateBlockSessionParams struct {
 }
 
 func (q *Queries) UpdateBlockSession(ctx context.Context, arg UpdateBlockSessionParams) (Session, error) {
-	row := q.db.QueryRowContext(ctx, updateBlockSession, arg.ID, arg.IsBlocked, arg.ExpiresAt)
+	row := q.db.QueryRow(ctx, updateBlockSession, arg.ID, arg.IsBlocked, arg.ExpiresAt)
 	var i Session
 	err := row.Scan(
 		&i.ID,

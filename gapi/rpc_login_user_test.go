@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	mockdb "github.com/mdmn07C5/bank/db/mock"
+	db "github.com/mdmn07C5/bank/db/sqlc"
 	"github.com/mdmn07C5/bank/pb"
 	mockwk "github.com/mdmn07C5/bank/worker/mock"
 	"github.com/stretchr/testify/require"
@@ -76,7 +77,7 @@ func TestLoginUserAPI(t *testing.T) {
 				store.EXPECT().
 					GetUser(gomock.Any(), gomock.Any()).
 					Times(1).
-					Return(user, sql.ErrNoRows)
+					Return(user, db.ErrRecordNotFound)
 			},
 			checkResponse: func(t *testing.T, res *pb.LoginUserResponse, err error) {
 				require.Error(t, err)

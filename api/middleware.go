@@ -1,13 +1,13 @@
 package api
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	db "github.com/mdmn07C5/bank/db/sqlc"
 	"github.com/mdmn07C5/bank/token"
 )
 
@@ -86,7 +86,7 @@ func sessionMiddleWare(server *Server) gin.HandlerFunc {
 
 		session, err := server.store.GetSession(ctx, req.SessionID)
 		if err != nil {
-			if err == sql.ErrNoRows {
+			if errors.Is(err, db.ErrRecordNotFound) {
 				ctx.AbortWithStatusJSON(http.StatusNotFound, errorResponse(err))
 				return
 			}

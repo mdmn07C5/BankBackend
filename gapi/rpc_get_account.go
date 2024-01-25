@@ -2,8 +2,8 @@ package gapi
 
 import (
 	"context"
-	"database/sql"
 
+	db "github.com/mdmn07C5/bank/db/sqlc"
 	"github.com/mdmn07C5/bank/pb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -17,7 +17,7 @@ func (server *Server) GetAccount(ctx context.Context, req *pb.GetAccountRequest)
 
 	account, err := server.store.GetAccount(ctx, req.GetId())
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == db.ErrRecordNotFound {
 			return nil, status.Errorf(codes.NotFound, "account does not exist: %s", err)
 		}
 		return nil, status.Errorf(codes.Internal, "failed to get account: %s", err)

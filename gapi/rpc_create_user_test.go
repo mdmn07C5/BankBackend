@@ -11,7 +11,6 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/lib/pq"
 	mockdb "github.com/mdmn07C5/bank/db/mock"
 	db "github.com/mdmn07C5/bank/db/sqlc"
 	"github.com/mdmn07C5/bank/pb"
@@ -165,7 +164,7 @@ func TestCreateUserAPI(t *testing.T) {
 				mockStore.EXPECT().
 					CreateUserTx(gomock.Any(), gomock.Any()).
 					Times(1).
-					Return(db.CreateUserTxResult{}, &pq.Error{Code: util.UniqueViolation})
+					Return(db.CreateUserTxResult{}, db.ErrUniqueViolation)
 			},
 			checkResponse: func(t *testing.T, res *pb.CreateUserResponse, err error) {
 				require.Error(t, err)
