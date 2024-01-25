@@ -3,7 +3,6 @@ package gapi
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"testing"
 	"time"
 
@@ -17,7 +16,6 @@ import (
 	"github.com/mdmn07C5/bank/pb"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -58,15 +56,7 @@ func TestCreateAccountAPI(t *testing.T) {
 					Return(account, nil)
 			},
 			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
-				accessToken, _, err := tokenMaker.CreateToken(user.Username, time.Minute)
-				require.NoError(t, err)
-				bearerToken := fmt.Sprintf("%s %s", authorizationBearer, accessToken)
-				md := metadata.MD{
-					authorizationHeader: []string{
-						bearerToken,
-					},
-				}
-				return metadata.NewIncomingContext(context.Background(), md)
+				return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute)
 			},
 			checkResponse: func(t *testing.T, res *pb.CreateAccountResponse, err error) {
 				require.NoError(t, err)
@@ -107,15 +97,7 @@ func TestCreateAccountAPI(t *testing.T) {
 					Return(account, sql.ErrConnDone)
 			},
 			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
-				accessToken, _, err := tokenMaker.CreateToken(user.Username, time.Minute)
-				require.NoError(t, err)
-				bearerToken := fmt.Sprintf("%s %s", authorizationBearer, accessToken)
-				md := metadata.MD{
-					authorizationHeader: []string{
-						bearerToken,
-					},
-				}
-				return metadata.NewIncomingContext(context.Background(), md)
+				return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute)
 			},
 			checkResponse: func(t *testing.T, res *pb.CreateAccountResponse, err error) {
 				require.Error(t, err)
@@ -135,15 +117,7 @@ func TestCreateAccountAPI(t *testing.T) {
 					Times(0)
 			},
 			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
-				accessToken, _, err := tokenMaker.CreateToken(user.Username, time.Minute)
-				require.NoError(t, err)
-				bearerToken := fmt.Sprintf("%s %s", authorizationBearer, accessToken)
-				md := metadata.MD{
-					authorizationHeader: []string{
-						bearerToken,
-					},
-				}
-				return metadata.NewIncomingContext(context.Background(), md)
+				return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute)
 			},
 			checkResponse: func(t *testing.T, res *pb.CreateAccountResponse, err error) {
 				require.Error(t, err)

@@ -3,7 +3,6 @@ package gapi
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"testing"
 	"time"
 
@@ -16,7 +15,6 @@ import (
 	"github.com/mdmn07C5/bank/pb"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -43,15 +41,7 @@ func TestGetAccountAPI(t *testing.T) {
 					Return(account, nil)
 			},
 			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
-				accessToken, _, err := tokenMaker.CreateToken(user.Username, time.Minute)
-				require.NoError(t, err)
-				bearerToken := fmt.Sprintf("%s %s", authorizationBearer, accessToken)
-				md := metadata.MD{
-					authorizationHeader: []string{
-						bearerToken,
-					},
-				}
-				return metadata.NewIncomingContext(context.Background(), md)
+				return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute)
 			},
 			checkResponse: func(t *testing.T, res *pb.GetAccountResponse, err error) {
 				require.NoError(t, err)
@@ -93,15 +83,7 @@ func TestGetAccountAPI(t *testing.T) {
 			},
 			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				unauthorizedUser, _ := randomUser(t)
-				accessToken, _, err := tokenMaker.CreateToken(unauthorizedUser.Username, time.Minute)
-				require.NoError(t, err)
-				bearerToken := fmt.Sprintf("%s %s", authorizationBearer, accessToken)
-				md := metadata.MD{
-					authorizationHeader: []string{
-						bearerToken,
-					},
-				}
-				return metadata.NewIncomingContext(context.Background(), md)
+				return newContextWithBearerToken(t, tokenMaker, unauthorizedUser.Username, time.Minute)
 			},
 			checkResponse: func(t *testing.T, res *pb.GetAccountResponse, err error) {
 				require.Error(t, err)
@@ -122,15 +104,7 @@ func TestGetAccountAPI(t *testing.T) {
 					Return(account, sql.ErrConnDone)
 			},
 			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
-				accessToken, _, err := tokenMaker.CreateToken(user.Username, time.Minute)
-				require.NoError(t, err)
-				bearerToken := fmt.Sprintf("%s %s", authorizationBearer, accessToken)
-				md := metadata.MD{
-					authorizationHeader: []string{
-						bearerToken,
-					},
-				}
-				return metadata.NewIncomingContext(context.Background(), md)
+				return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute)
 			},
 			checkResponse: func(t *testing.T, res *pb.GetAccountResponse, err error) {
 				require.Error(t, err)
@@ -151,15 +125,7 @@ func TestGetAccountAPI(t *testing.T) {
 					Return(db.Account{}, sql.ErrNoRows)
 			},
 			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
-				accessToken, _, err := tokenMaker.CreateToken(user.Username, time.Minute)
-				require.NoError(t, err)
-				bearerToken := fmt.Sprintf("%s %s", authorizationBearer, accessToken)
-				md := metadata.MD{
-					authorizationHeader: []string{
-						bearerToken,
-					},
-				}
-				return metadata.NewIncomingContext(context.Background(), md)
+				return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute)
 			},
 			checkResponse: func(t *testing.T, res *pb.GetAccountResponse, err error) {
 				require.Error(t, err)

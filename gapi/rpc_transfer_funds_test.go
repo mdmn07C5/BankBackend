@@ -2,7 +2,6 @@ package gapi
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -15,7 +14,6 @@ import (
 
 	"github.com/mdmn07C5/bank/pb"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/grpc/metadata"
 )
 
 func TestTransferFundsAPI(t *testing.T) {
@@ -68,15 +66,7 @@ func TestTransferFundsAPI(t *testing.T) {
 					Times(1)
 			},
 			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
-				accessToken, _, err := tokenMaker.CreateToken(fromAccount.Owner, time.Minute)
-				require.NoError(t, err)
-				bearerToken := fmt.Sprintf("%s %s", authorizationBearer, accessToken)
-				md := metadata.MD{
-					authorizationHeader: []string{
-						bearerToken,
-					},
-				}
-				return metadata.NewIncomingContext(context.Background(), md)
+				return newContextWithBearerToken(t, tokenMaker, fromUser.Username, time.Minute)
 			},
 			checkResponse: func(t *testing.T, res *pb.TransferResponse, err error) {
 				require.NoError(t, err)
