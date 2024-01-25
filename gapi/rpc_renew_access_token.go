@@ -2,10 +2,10 @@ package gapi
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"time"
 
+	db "github.com/mdmn07C5/bank/db/sqlc"
 	"github.com/mdmn07C5/bank/pb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -20,7 +20,7 @@ func (server *Server) RenewAccessToken(ctx context.Context, req *pb.RenewAccessT
 
 	session, err := server.store.GetSession(ctx, refreshPayload.ID)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == db.ErrRecordNotFound {
 			return nil, status.Errorf(codes.NotFound, "session not found")
 		}
 		return nil, status.Errorf(codes.Internal, "failed to find session: %s", err)

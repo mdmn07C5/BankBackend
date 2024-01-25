@@ -2,7 +2,6 @@ package gapi
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 
 	db "github.com/mdmn07C5/bank/db/sqlc"
@@ -50,7 +49,7 @@ func (server *Server) TransferFunds(ctx context.Context, req *pb.TransferRequest
 func (server *Server) validAccount(ctx context.Context, accountID int64, currency string) (db.Account, error) {
 	account, err := server.store.GetAccount(ctx, accountID)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == db.ErrRecordNotFound {
 			return account, status.Errorf(codes.NotFound, "account not found:%s", err)
 		}
 		return account, status.Errorf(codes.Internal, "failed to validate account:%s", err)
