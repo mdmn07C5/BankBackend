@@ -103,6 +103,7 @@ func runGatewayServer(config util.Config, store db.Store, taskDistributor worker
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot start HTTP gateway server:")
 	}
+
 }
 
 func runGRPCServer(config util.Config, store db.Store, taskDistributor worker.TaskDistributor) {
@@ -122,7 +123,7 @@ func runGRPCServer(config util.Config, store db.Store, taskDistributor worker.Ta
 		log.Fatal().Err(err).Msg("cannot create net.Listener:")
 	}
 
-	log.Info().Msgf("start gRPC server at %s", listener.Addr())
+	log.Info().Msgf("starting gRPC server at %s", listener.Addr())
 	err = grpcServer.Serve(listener)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot start gRPC server:")
@@ -156,7 +157,7 @@ func runDBMigration(migrationURL, dbSource string) {
 func runTaskProcessor(config util.Config, redisOpt asynq.RedisClientOpt, store db.Store) {
 	mailer := mail.NewGmailSender(config.EmailSenderName, config.EmailSenderAddress, config.EmailSenderPassword)
 	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store, mailer)
-	log.Info().Msg("start task processor")
+	log.Info().Msg("starting task processor")
 	err := taskProcessor.Start()
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to start task processor")

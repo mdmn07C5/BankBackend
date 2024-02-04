@@ -15,6 +15,10 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+const (
+	emailTaskDelay = 10
+)
+
 func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
 	if violations := validateCreateUserRequest(req); violations != nil {
 		return nil, invalidArgumentError(violations)
@@ -37,7 +41,7 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 			}
 			opts := []asynq.Option{
 				asynq.MaxRetry(10),
-				asynq.ProcessIn(10 * time.Second),
+				asynq.ProcessIn(emailTaskDelay * time.Second),
 				asynq.Queue(worker.QueueCritical),
 			}
 			return server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, taskPayload, opts...)
