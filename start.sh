@@ -2,5 +2,5 @@
 
 set -e 
 
-echo "start app"
+echo "starting app"
 exec "$@"
