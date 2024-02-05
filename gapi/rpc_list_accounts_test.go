@@ -53,7 +53,7 @@ func TestListAccountsAPI(t *testing.T) {
 					Return(accounts, nil)
 			},
 			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute)
+				return newContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			checkResponse: func(t *testing.T, res *pb.ListAccountsResponse, err error) {
 				require.NoError(t, err)
@@ -97,7 +97,7 @@ func TestListAccountsAPI(t *testing.T) {
 					Return(accounts, sql.ErrConnDone)
 			},
 			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute)
+				return newContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			checkResponse: func(t *testing.T, res *pb.ListAccountsResponse, err error) {
 				require.Error(t, err)
@@ -118,7 +118,7 @@ func TestListAccountsAPI(t *testing.T) {
 					Times(0)
 			},
 			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute)
+				return newContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			checkResponse: func(t *testing.T, res *pb.ListAccountsResponse, err error) {
 				require.Error(t, err)

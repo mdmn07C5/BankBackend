@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	db "github.com/mdmn07C5/bank/db/sqlc"
+	"github.com/mdmn07C5/bank/util"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -17,7 +18,7 @@ func (server *Server) TransferFunds(ctx context.Context, req *pb.TransferRequest
 		return nil, err
 	}
 
-	authPayload, err := server.authorizeUser(ctx)
+	authPayload, err := server.authorizeUser(ctx, []string{util.BankerRole, util.DepositorRole})
 	if err != nil {
 		return nil, err
 	}
