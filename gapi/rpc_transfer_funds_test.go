@@ -66,7 +66,7 @@ func TestTransferFundsAPI(t *testing.T) {
 					Times(1)
 			},
 			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, fromUser.Username, time.Minute)
+				return newContextWithBearerToken(t, tokenMaker, fromUser.Username, fromUser.Role, time.Minute)
 			},
 			checkResponse: func(t *testing.T, res *pb.TransferResponse, err error) {
 				require.NoError(t, err)

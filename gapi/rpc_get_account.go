@@ -5,12 +5,13 @@ import (
 
 	db "github.com/mdmn07C5/bank/db/sqlc"
 	"github.com/mdmn07C5/bank/pb"
+	"github.com/mdmn07C5/bank/util"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 func (server *Server) GetAccount(ctx context.Context, req *pb.GetAccountRequest) (*pb.GetAccountResponse, error) {
-	authPayload, err := server.authorizeUser(ctx)
+	authPayload, err := server.authorizeUser(ctx, []string{util.BankerRole, util.DepositorRole})
 	if err != nil {
 		return nil, unauthenticatedError(err)
 	}

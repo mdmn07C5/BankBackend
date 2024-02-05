@@ -4,6 +4,7 @@ import (
 	"context"
 
 	db "github.com/mdmn07C5/bank/db/sqlc"
+	"github.com/mdmn07C5/bank/util"
 	"github.com/mdmn07C5/bank/val"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
@@ -13,7 +14,7 @@ import (
 )
 
 func (server *Server) ListAccounts(ctx context.Context, req *pb.ListAccountsRequest) (*pb.ListAccountsResponse, error) {
-	authPayload, err := server.authorizeUser(ctx)
+	authPayload, err := server.authorizeUser(ctx, []string{util.BankerRole, util.DepositorRole})
 	if err != nil {
 		return nil, unauthenticatedError(err)
 	}

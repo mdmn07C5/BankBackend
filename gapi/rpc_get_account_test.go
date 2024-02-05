@@ -41,7 +41,7 @@ func TestGetAccountAPI(t *testing.T) {
 					Return(account, nil)
 			},
 			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute)
+				return newContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			checkResponse: func(t *testing.T, res *pb.GetAccountResponse, err error) {
 				require.NoError(t, err)
@@ -83,7 +83,7 @@ func TestGetAccountAPI(t *testing.T) {
 			},
 			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				unauthorizedUser, _ := randomUser(t)
-				return newContextWithBearerToken(t, tokenMaker, unauthorizedUser.Username, time.Minute)
+				return newContextWithBearerToken(t, tokenMaker, unauthorizedUser.Username, user.Role, time.Minute)
 			},
 			checkResponse: func(t *testing.T, res *pb.GetAccountResponse, err error) {
 				require.Error(t, err)
@@ -104,7 +104,7 @@ func TestGetAccountAPI(t *testing.T) {
 					Return(account, sql.ErrConnDone)
 			},
 			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute)
+				return newContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			checkResponse: func(t *testing.T, res *pb.GetAccountResponse, err error) {
 				require.Error(t, err)
@@ -125,7 +125,7 @@ func TestGetAccountAPI(t *testing.T) {
 					Return(db.Account{}, db.ErrRecordNotFound)
 			},
 			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute)
+				return newContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			checkResponse: func(t *testing.T, res *pb.GetAccountResponse, err error) {
 				require.Error(t, err)
