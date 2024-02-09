@@ -19,6 +19,8 @@ import (
 
 func TestUpdateUserAPI(t *testing.T) {
 	user, _ := randomUser(t)
+	banker, _ := randomUser(t)
+	banker.Role = util.BankerRole
 
 	newName := util.RandomOwner()
 	newEmail := util.RandomEmail()
@@ -187,6 +189,52 @@ func TestUpdateUserAPI(t *testing.T) {
 				st, ok := status.FromError(err)
 				require.Equal(t, codes.InvalidArgument, st.Code())
 				require.True(t, ok)
+			},
+		},
+		{
+			name: "BankerUpdateOK",
+			req: &pb.UpdateUserRequest{
+				Username: user.Username,
+				FullName: &newName,
+				Email:    &newEmail,
+			},
+			buildStubs: func(mockStore *mockdb.MockStore) {
+				arg := db.UpdateUserParams{
+					Username: user.Username,
+					FullName: pgtype.Text{
+						String: newName,
+						Valid:  true,
+					},
+					Email: pgtype.Text{
+						String: newEmail,
+						Valid:  true,
+					},
+				}
+				updatedUser := db.User{
+					Username:          user.Username,
+					HashedPassword:    user.HashedPassword,
+					FullName:          newName,
+					Email:             newEmail,
+					PasswordChangedAt: user.PasswordChangedAt,
+					CreatedAt:         user.CreatedAt,
+					IsEmailVerified:   user.IsEmailVerified,
+					Role:              user.Role,
+				}
+				mockStore.EXPECT().
+					UpdateUser(gomock.Any(), gomock.Eq(arg)).
+					Times(1).
+					Return(updatedUser, nil)
+			},
+			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, banker.Username, banker.Role, time.Minute)
+			},
+			checkResponse: func(t *testing.T, res *pb.UpdateUserResponse, err error) {
+				require.NoError(t, err)
+				require.NotNil(t, res)
+				updatedUser := res.GetUser()
+				require.Equal(t, user.Username, updatedUser.Username)
+				require.Equal(t, newName, updatedUser.FullName)
+				require.Equal(t, newEmail, updatedUser.Email)
 			},
 		},
 	}
