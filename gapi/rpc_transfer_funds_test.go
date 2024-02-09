@@ -2,6 +2,7 @@ package gapi
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 	"time"
 
@@ -11,6 +12,8 @@ import (
 	"github.com/mdmn07C5/bank/token"
 	"github.com/mdmn07C5/bank/util"
 	mockwk "github.com/mdmn07C5/bank/worker/mock"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/mdmn07C5/bank/pb"
 	"github.com/stretchr/testify/require"
@@ -73,7 +76,154 @@ func TestTransferFundsAPI(t *testing.T) {
 				require.NotNil(t, res)
 			},
 		},
-		// TODO: the rest of the test cases
+		{
+			name: "Unauthenticated",
+			req: &pb.TransferRequest{
+				FromAccountId: fromAccount.ID,
+				ToAccountId:   toAccount.ID,
+				Amount:        amount,
+				Currency:      util.USD,
+			},
+			buildStubs: func(mockStore *mockdb.MockStore) {
+				mockStore.EXPECT().
+					GetAccount(gomock.Any(), gomock.Eq(fromAccount.ID)).
+					Times(1).
+					Return(fromAccount, nil)
+			},
+			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, toUser.Username, toUser.Role, time.Minute)
+			},
+			checkResponse: func(t *testing.T, res *pb.TransferResponse, err error) {
+				require.Error(t, err)
+				st, ok := status.FromError(err)
+				require.True(t, ok)
+				require.Equal(t, codes.Unauthenticated, st.Code())
+			},
+		},
+		{
+			name: "FromAccountNotFound",
+			req: &pb.TransferRequest{
+				FromAccountId: fromAccount.ID,
+				ToAccountId:   toAccount.ID,
+				Amount:        amount,
+				Currency:      util.USD,
+			},
+			buildStubs: func(mockStore *mockdb.MockStore) {
+				mockStore.EXPECT().
+					GetAccount(gomock.Any(), gomock.Eq(fromAccount.ID)).
+					Times(1).
+					Return(db.Account{}, db.ErrRecordNotFound)
+			},
+			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, fromUser.Username, fromUser.Role, time.Minute)
+			},
+			checkResponse: func(t *testing.T, res *pb.TransferResponse, err error) {
+				require.Error(t, err)
+				st, ok := status.FromError(err)
+				require.True(t, ok)
+				require.Equal(t, codes.NotFound, st.Code())
+			},
+		},
+		{
+			name: "ToAccountNotFound",
+			req: &pb.TransferRequest{
+				FromAccountId: fromAccount.ID,
+				ToAccountId:   toAccount.ID,
+				Amount:        amount,
+				Currency:      util.USD,
+			},
+			buildStubs: func(mockStore *mockdb.MockStore) {
+				mockStore.EXPECT().
+					GetAccount(gomock.Any(), gomock.Eq(fromAccount.ID)).
+					Times(1).
+					Return(fromAccount, nil)
+				mockStore.EXPECT().
+					GetAccount(gomock.Any(), gomock.Eq(toAccount.ID)).
+					Times(1).
+					Return(db.Account{}, db.ErrRecordNotFound)
+			},
+			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, fromUser.Username, fromUser.Role, time.Minute)
+			},
+			checkResponse: func(t *testing.T, res *pb.TransferResponse, err error) {
+				require.Error(t, err)
+				st, ok := status.FromError(err)
+				require.True(t, ok)
+				require.Equal(t, codes.NotFound, st.Code())
+			},
+		},
+		{
+			name: "CurrencyMismatch",
+			req: &pb.TransferRequest{
+				FromAccountId: fromAccount.ID,
+				ToAccountId:   otherAccount.ID,
+				Amount:        amount,
+				Currency:      otherAccount.Currency,
+			},
+			buildStubs: func(mockStore *mockdb.MockStore) {
+				mockStore.EXPECT().
+					GetAccount(gomock.Any(), gomock.Eq(fromAccount.ID)).
+					Times(1).
+					Return(fromAccount, nil)
+			},
+			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, fromUser.Username, fromUser.Role, time.Minute)
+			},
+			checkResponse: func(t *testing.T, res *pb.TransferResponse, err error) {
+				require.Error(t, err)
+				st, ok := status.FromError(err)
+				require.True(t, ok)
+				require.Equal(t, codes.InvalidArgument, st.Code())
+			},
+		},
+		{
+			name: "UnauthorizedUser",
+			req: &pb.TransferRequest{
+				FromAccountId: fromAccount.ID,
+				ToAccountId:   toAccount.ID,
+				Amount:        amount,
+				Currency:      util.USD,
+			},
+			buildStubs: func(mockStore *mockdb.MockStore) {
+				mockStore.EXPECT().
+					GetAccount(gomock.Any(), gomock.Eq(fromAccount.ID)).
+					Times(1).
+					Return(fromAccount, nil)
+			},
+			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, otherUser.Username, otherUser.Role, time.Minute)
+			},
+			checkResponse: func(t *testing.T, res *pb.TransferResponse, err error) {
+				require.Error(t, err)
+				st, ok := status.FromError(err)
+				require.True(t, ok)
+				require.Equal(t, codes.Unauthenticated, st.Code())
+			},
+		},
+		{
+			name: "InternalError",
+			req: &pb.TransferRequest{
+				FromAccountId: fromAccount.ID,
+				ToAccountId:   toAccount.ID,
+				Amount:        amount,
+				Currency:      util.USD,
+			},
+			buildStubs: func(mockStore *mockdb.MockStore) {
+				mockStore.EXPECT().
+					GetAccount(gomock.Any(), gomock.Eq(fromAccount.ID)).
+					Times(1).
+					Return(db.Account{}, sql.ErrConnDone)
+			},
+			buildContext: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, fromUser.Username, fromUser.Role, time.Minute)
+			},
+			checkResponse: func(t *testing.T, res *pb.TransferResponse, err error) {
+				require.Error(t, err)
+				st, ok := status.FromError(err)
+				require.True(t, ok)
+				require.Equal(t, codes.Internal, st.Code())
+			},
+		},
 	}
 
 	for i := range testCases {

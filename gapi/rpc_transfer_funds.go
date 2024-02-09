@@ -13,12 +13,12 @@ import (
 )
 
 func (server *Server) TransferFunds(ctx context.Context, req *pb.TransferRequest) (*pb.TransferResponse, error) {
-	fromAccount, err := server.validAccount(ctx, req.GetFromAccountId(), req.GetCurrency())
+	authPayload, err := server.authorizeUser(ctx, []string{util.BankerRole, util.DepositorRole})
 	if err != nil {
 		return nil, err
 	}
 
-	authPayload, err := server.authorizeUser(ctx, []string{util.BankerRole, util.DepositorRole})
+	fromAccount, err := server.validAccount(ctx, req.GetFromAccountId(), req.GetCurrency())
 	if err != nil {
 		return nil, err
 	}
