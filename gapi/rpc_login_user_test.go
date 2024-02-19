@@ -16,7 +16,8 @@ import (
 )
 
 func TestLoginUserAPI(t *testing.T) {
-	user, password := randomUser(t)
+	user, password := randomVerifiedUser(t)
+	unverifiedUser, unverifedUserPW := randomUser(t)
 
 	testCases := []struct {
 		name          string
@@ -120,6 +121,25 @@ func TestLoginUserAPI(t *testing.T) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
 				require.Equal(t, codes.InvalidArgument, st.Code())
+				require.True(t, ok)
+			},
+		},
+		{
+			name: "Not Email Validated",
+			req: &pb.LoginUserRequest{
+				Username: unverifiedUser.Username,
+				Password: unverifedUserPW,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetUser(gomock.Any(), gomock.Eq(unverifiedUser.Username)).
+					Times(1).
+					Return(unverifiedUser, nil)
+			},
+			checkResponse: func(t *testing.T, res *pb.LoginUserResponse, err error) {
+				require.Error(t, err)
+				st, ok := status.FromError(err)
+				require.Equal(t, codes.Unauthenticated, st.Code())
 				require.True(t, ok)
 			},
 		},

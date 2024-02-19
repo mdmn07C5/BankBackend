@@ -71,6 +71,23 @@ func randomUser(t *testing.T) (user db.User, password string) {
 
 }
 
+func randomVerifiedUser(t *testing.T) (user db.User, password string) {
+	password = util.RandomString(8)
+	hashedPassword, err := util.HashPassword(password)
+	require.NoError(t, err)
+
+	user = db.User{
+		Username:        util.RandomOwner(),
+		Role:            util.DepositorRole,
+		HashedPassword:  hashedPassword,
+		FullName:        util.RandomOwner(),
+		Email:           util.RandomEmail(),
+		IsEmailVerified: true,
+	}
+	return
+
+}
+
 func requireBodyMatchUser(t *testing.T, body *bytes.Buffer, user db.User) {
 	data, err := io.ReadAll(body)
 	require.NoError(t, err)
