@@ -27,6 +27,10 @@ func (server *Server) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 		return nil, status.Errorf(codes.Internal, "failed to find user: %s", err)
 	}
 
+	if !user.IsEmailVerified {
+		return nil, status.Errorf(codes.Unauthenticated, "user not email verified: %s", err)
+	}
+
 	err = util.CheckPassword(req.Password, user.HashedPassword)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "username and password do not match")
