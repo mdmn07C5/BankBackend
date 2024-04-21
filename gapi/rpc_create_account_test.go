@@ -137,7 +137,7 @@ func TestCreateAccountAPI(t *testing.T) {
 			mockStore := mockdb.NewMockStore(ctrl)
 
 			tskCtrl := gomock.NewController(t)
-			defer ctrl.Finish()
+			defer tskCtrl.Finish()
 			taskDistributor := mockwk.NewMockTaskDistributor(tskCtrl)
 
 			tc.buildStubs(mockStore)

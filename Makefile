@@ -56,4 +56,7 @@ evans:
 redis:
 	docker run --name redis -p 6379:6379 -d redis:7-alpine
 
-.PHONY: postgres createdb dropdb migrateup migratedown new_migration sqlc test server mock testAPI migrateup1 migratedown1 proto evans redis
+network:
+	docker network create bank-network
+
+.PHONY: postgres createdb dropdb migrateup migratedown new_migration sqlc test server mock testAPI migrateup1 migratedown1 proto evans redis network
